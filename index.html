@@ -2,592 +2,1064 @@
 <html lang="zh-CN">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>龙宝宝生活助手</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <title>小龙王灵签</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
-
-    :root {
-      --page-max: 430px;
-      --glass-radius: 30px;
-      --mini-radius: 20px;
-    }
-
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
+      -webkit-tap-highlight-color: transparent
     }
 
     html,
     body {
-      min-height: 100%;
+      width: 100%;
       height: 100%;
-    }
-
-    body {
-      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      background: #c8b896;
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
-
-    .page {
-      position: relative;
-      max-width: var(--page-max);
-      min-height: 100vh;
-      min-height: 100dvh;
-      margin: 0 auto;
       overflow: hidden;
+      font-family: 'Noto Serif SC', 'STKaiti', 'KaiTi', 'SimSun', serif;
+      user-select: none;
+      -webkit-user-select: none
     }
 
-    /* ========== 全屏背景 — 自适应铺满 ========== */
-    .page-bg {
+    /* ========== 背景 ========== */
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0
+    }
+
+    .bg-img {
+      position: absolute;
+      inset: 0;
+      background: url('bg.jpg') center center/cover no-repeat
+    }
+
+    .bg-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 28%;
+      background: linear-gradient(180deg, rgba(8, 2, 18, .72) 0%, rgba(8, 2, 18, .2) 55%, transparent 100%);
+      z-index: 1
+    }
+
+    .bg-bot {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 42%;
+      background: linear-gradient(0deg, rgba(5, 0, 8, .88) 0%, rgba(5, 0, 8, .4) 40%, transparent 100%);
+      z-index: 1
+    }
+
+    .bg-glow {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(ellipse at 55% 35%, rgba(255, 210, 80, .06) 0%, transparent 55%);
+      animation: bgG 5s ease-in-out infinite alternate
+    }
+
+    @keyframes bgG {
+      0% {
+        opacity: .4
+      }
+
+      100% {
+        opacity: 1
+      }
+    }
+
+    .gold-box {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      pointer-events: none;
+      overflow: hidden
+    }
+
+    .gp {
+      position: absolute;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 215, 0, .85), rgba(255, 180, 0, .2));
+      animation: gpUp linear infinite
+    }
+
+    @keyframes gpUp {
+      0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0
+      }
+
+      12% {
+        opacity: .7
+      }
+
+      88% {
+        opacity: .7
+      }
+
+      100% {
+        transform: translateY(-12vh) scale(1);
+        opacity: 0
+      }
+    }
+
+    /* ========== 标题 ========== */
+    .header {
       position: fixed;
       top: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: var(--page-max);
-      /* 撑满整个视口高度，包含动态工具栏 */
-      height: 100vh;
-      height: 100dvh;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-    .page-bg img {
-      width: 100%;
-      height: 100%;
-      /* cover 保证任何尺寸都铺满，不留白边 */
-      object-fit: cover;
-      /* 顶部对齐，角色头部不被裁切 */
-      object-position: top center;
-      /* 轻微降饱和避免与玻璃卡片叠色 */
-      filter: saturate(0.90) brightness(1.02) contrast(0.98);
-      /* 禁止图片被选中/拖拽 */
-      user-select: none;
-      -webkit-user-drag: none;
-      display: block;
-    }
-
-    .content {
-      position: relative;
-      z-index: 2;
-      padding-bottom: 42px;
-    }
-
-    .top-spacer {
-      height: 56vw;
-      max-height: 290px;
-    }
-
-    /* ========== 天气卡片 ========== */
-    .weather-card {
-      position: relative;
-      margin: 0 16px 16px;
-      border-radius: 28px;
-      overflow: hidden;
-      box-shadow:
-        0 8px 22px rgba(34, 44, 62, 0.08),
-        inset 0 1px 0 rgba(255, 255, 255, 0.24);
-    }
-
-    .weather-card .card-bg {
-      position: relative;
-    }
-
-    .weather-card .card-bg img {
-      width: 100%;
-      height: auto;
-      display: block;
-      object-fit: contain;
-    }
-
-    .weather-body {
-      position: absolute;
       left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 3;
-      padding: 12px 24px 22px;
+      width: 100%;
+      z-index: 20;
+      padding: clamp(14px, 3.5vw, 22px) 0 10px;
+      text-align: center
     }
 
-    .w-loc {
-      display: flex;
-      align-items: center;
-      margin-left: 15px;
-      transform: translateY(-6px);
+    .h1 {
+      font-size: clamp(22px, 6.5vw, 30px);
+      color: #ffd700;
+      letter-spacing: 6px;
+      font-weight: bold;
+      text-shadow: 0 0 14px rgba(255, 215, 0, .5), 0 2px 6px rgba(0, 0, 0, .8)
     }
 
-    .w-loc .city {
-      font-size: 15px;
-      font-weight: 700;
-      color: rgba(20, 24, 32, 0.88);
-      letter-spacing: .3px;
+    .h2 {
+      font-size: clamp(10px, 2.8vw, 13px);
+      color: rgba(255, 255, 255, .62);
+      margin-top: 3px;
+      letter-spacing: 2px;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, .6)
     }
 
-    .w-temp {
-      font-size: 30px;
-      font-weight: 300;
-      line-height: 1.05;
-      letter-spacing: -0.6px;
-      color: rgba(16, 20, 28, 0.94);
-      margin: 0 0 6px;
-      margin-left: 8px;
-      transform: translateY(-6px);
-    }
-
-    .w-detail {
-      display: flex;
-      align-items: center;
-      font-size: 12px;
-      color: rgba(74, 84, 98, 0.82);
-      margin-left: 8px;
-      transform: translateY(-6px);
-    }
-
-    .w-detail .sep {
-      margin: 0 8px;
-      color: rgba(166, 176, 194, 0.92);
-    }
-
-    .w-detail .trend {
-      margin-left: 5px;
-      display: inline-flex;
-      align-items: center;
-    }
-
-    .w-detail .trend svg {
-      width: 12px;
-      height: 12px;
-    }
-
-    /* ========== 极冷白 Liquid Glass 主卡片 ========== */
-    .g-card {
-      position: relative;
-      margin: 0 16px 16px;
-      padding: 22px 18px 24px;
-      border-radius: var(--glass-radius);
-      overflow: hidden;
-      isolation: isolate;
-
-      background:
-        linear-gradient(180deg,
-          rgba(255, 255, 255, 0.18) 0%,
-          rgba(234, 242, 255, 0.16) 40%,
-          rgba(240, 247, 255, 0.13) 100%);
-
-      -webkit-backdrop-filter:
-        blur(16px) saturate(102%) brightness(1.07) contrast(1.02);
-      backdrop-filter:
-        blur(16px) saturate(102%) brightness(1.07) contrast(1.02);
-
-      border: 1px solid rgba(255, 255, 255, 0.38);
-
-      box-shadow:
-        0 10px 22px rgba(34, 46, 66, 0.08),
-        0 2px 8px rgba(255, 255, 255, 0.18),
-        inset 0 1px 0 rgba(255, 255, 255, 0.62),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
-    }
-
-    .g-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: var(--glass-radius);
-      pointer-events: none;
-      z-index: 0;
-      background:
-        linear-gradient(180deg,
-          rgba(210, 226, 255, 0.16) 0%,
-          rgba(220, 234, 255, 0.12) 45%,
-          rgba(235, 244, 255, 0.05) 100%);
-    }
-
-    .g-card> :not(.lg-base):not(.lg-specular):not(.lg-caustic):not(.lg-edge):not(.lg-rim) {
-      position: relative;
-      z-index: 6;
-    }
-
-    .lg-base {
-      position: absolute;
-      inset: 0;
-      border-radius: var(--glass-radius);
-      z-index: 1;
-      pointer-events: none;
-      background:
-        radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.18) 0%, rgba(234, 242, 255, 0.10) 30%, transparent 58%),
-        radial-gradient(80% 60% at 100% 0%, rgba(220, 232, 255, 0.12) 0%, transparent 48%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(234, 242, 255, 0.04));
-      mix-blend-mode: screen;
-      opacity: .98;
-    }
-
-    .lg-specular {
-      position: absolute;
-      left: 10px;
-      right: 10px;
-      top: 8px;
-      height: 36%;
-      border-radius: 24px;
-      z-index: 2;
-      pointer-events: none;
-      background:
-        linear-gradient(180deg,
-          rgba(255, 255, 255, 0.72) 0%,
-          rgba(236, 244, 255, 0.30) 20%,
-          rgba(236, 244, 255, 0.09) 46%,
-          rgba(255, 255, 255, 0) 100%);
-      opacity: .92;
-    }
-
-    .lg-caustic {
-      position: absolute;
-      left: -10%;
-      right: -10%;
-      bottom: -10px;
-      height: 28%;
-      z-index: 3;
+    /* ========== 音效 ========== */
+    .snd {
+      position: fixed;
+      top: 16px;
+      right: 12px;
+      z-index: 25;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
-      pointer-events: none;
-      background:
-        radial-gradient(56% 100% at 16% 18%, rgba(255, 255, 255, 0.18) 0%, rgba(230, 240, 255, 0.08) 34%, transparent 66%),
-        radial-gradient(42% 90% at 52% 30%, rgba(224, 236, 255, 0.12) 0%, rgba(232, 242, 255, 0.05) 36%, transparent 64%),
-        radial-gradient(32% 70% at 84% 18%, rgba(255, 255, 255, 0.10) 0%, rgba(232, 242, 255, 0.04) 36%, transparent 64%);
-      filter: blur(10px);
-      opacity: .42;
-      mix-blend-mode: screen;
-    }
-
-    .lg-edge {
-      position: absolute;
-      inset: 0;
-      border-radius: var(--glass-radius);
-      z-index: 4;
-      pointer-events: none;
-      box-shadow:
-        inset 0 1.5px 0 rgba(255, 255, 255, 0.76),
-        inset 1px 0 0 rgba(255, 255, 255, 0.16),
-        inset -1px 0 0 rgba(255, 255, 255, 0.10),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.08),
-        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
-    }
-
-    .lg-rim {
-      position: absolute;
-      inset: 0;
-      border-radius: var(--glass-radius);
-      z-index: 5;
-      pointer-events: none;
-      box-shadow:
-        0 0 0 1px rgba(255, 255, 255, 0.06),
-        0 1px 0 rgba(255, 255, 255, 0.14);
-    }
-
-    /* ========== 标题区 ========== */
-    .card-hd {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 4px;
-      padding: 0 2px;
-    }
-
-    .card-hd-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 20px;
-      font-weight: 700;
-      color: rgba(22, 28, 36, 0.94);
-      letter-spacing: .2px;
-    }
-
-    .card-hd-title .ico {
-      width: 26px;
-      height: 26px;
+      background: rgba(0, 0, 0, .3);
+      border: 1px solid rgba(255, 255, 255, .18);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
+      backdrop-filter: blur(6px)
     }
 
-    .card-hd-title .ico svg {
-      width: 100%;
-      height: 100%;
+    .snd:active {
+      transform: scale(.88)
     }
 
-    .card-more {
-      border: none;
-      background: none;
+    /* ========== 气泡 ========== */
+    .bub {
+      position: fixed;
+      z-index: 18;
+      left: 50%;
+      top: clamp(62px, 16%, 95px);
+      transform: translateX(-50%) translateY(8px);
+      padding: 9px 18px;
+      background: rgba(255, 255, 255, .93);
+      border-radius: 18px;
+      color: #3a2a1a;
+      font-size: 13px;
+      text-align: center;
+      line-height: 1.5;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .22);
+      max-width: 82vw;
+      white-space: nowrap;
+      opacity: 0;
+      transition: all .5s ease;
+      pointer-events: none
+    }
+
+    .bub::after {
+      content: '';
+      position: absolute;
+      bottom: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 7px solid transparent;
+      border-top-color: rgba(255, 255, 255, .93)
+    }
+
+    .bub.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    /* ========== 签筒热区 ========== */
+    .hotspot {
+      position: fixed;
+      z-index: 12;
       cursor: pointer;
-      padding: 6px 0;
+      width: 55vw;
+      max-width: 280px;
+      height: 45vw;
+      max-height: 300px;
+      min-width: 180px;
+      min-height: 160px;
+      left: 50%;
+      bottom: 22%;
+      transform: translateX(-50%);
+      border-radius: 20px
+    }
+
+    .hs-glow {
+      position: absolute;
+      inset: -15%;
+      border-radius: 50%;
+      pointer-events: none;
+      background: radial-gradient(ellipse, rgba(255, 215, 0, .18) 0%, transparent 65%);
+      animation: hsG 2s ease-in-out infinite alternate
+    }
+
+    @keyframes hsG {
+      0% {
+        transform: scale(.85);
+        opacity: .25
+      }
+
+      100% {
+        transform: scale(1.2);
+        opacity: .9
+      }
+    }
+
+    .hs-txt {
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      color: rgba(255, 215, 0, .75);
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(255, 215, 0, .35), 0 1px 3px rgba(0, 0, 0, .5);
+      animation: htB 2s ease-in-out infinite;
+      pointer-events: none;
+      background: rgba(0, 0, 0, .35);
+      padding: 4px 14px;
+      border-radius: 12px;
+      backdrop-filter: blur(3px)
+    }
+
+    @keyframes htB {
+
+      0%,
+      100% {
+        opacity: .4
+      }
+
+      50% {
+        opacity: 1
+      }
+    }
+
+    .hs-rip {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80%;
+      height: 80%;
+      transform: translate(-50%, -50%) scale(0);
+      border: 2.5px solid rgba(255, 215, 0, .55);
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none
+    }
+
+    .hs-rip.go {
+      animation: ripG .8s ease-out forwards
+    }
+
+    .hs-rip2 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 60%;
+      height: 60%;
+      transform: translate(-50%, -50%) scale(0);
+      border: 2px solid rgba(255, 255, 255, .3);
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none
+    }
+
+    .hs-rip2.go {
+      animation: ripG .9s .1s ease-out forwards
+    }
+
+    @keyframes ripG {
+      0% {
+        transform: translate(-50%, -50%) scale(.3);
+        opacity: 1
+      }
+
+      100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0
+      }
+    }
+
+    /* ========== 摇签遮罩 ========== */
+    .shake-ov {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
       display: flex;
       align-items: center;
-      gap: 1px;
-      font-size: 14px;
-      font-weight: 500;
-      color: rgba(88, 102, 126, 0.58);
+      justify-content: center;
+      background: rgba(0, 0, 0, 0);
+      visibility: hidden;
+      transition: background .4s, backdrop-filter .4s;
+      backdrop-filter: blur(0)
     }
 
-    .card-more .arr {
-      font-size: 18px;
-      color: rgba(88, 102, 126, 0.42);
+    .shake-ov.show {
+      visibility: visible;
+      background: rgba(0, 0, 0, .6);
+      backdrop-filter: blur(8px)
     }
 
-    /* ========== 运势三列 ========== */
-    .fortune-grid {
-      display: flex;
-      gap: 3px;
-    }
-
-    .fortune-col {
+    .qt-stage {
       position: relative;
-      flex: 1;
-      min-width: 0;
-      border-radius: var(--mini-radius);
-      overflow: hidden;
-      isolation: isolate;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(236, 243, 255, 0.10));
-      -webkit-backdrop-filter: blur(12px) saturate(105%) brightness(1.04);
-      backdrop-filter: blur(12px) saturate(105%) brightness(1.04);
-      border: 1px solid rgba(255, 255, 255, 0.28);
-      box-shadow:
-        0 5px 12px rgba(36, 46, 66, 0.06),
-        inset 0 1px 0 rgba(255, 255, 255, 0.48),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+      width: clamp(150px, 42vw, 220px);
+      transform: scale(0) rotate(-15deg);
+      opacity: 0;
+      transition: all .5s cubic-bezier(.34, 1.56, .64, 1);
+      perspective: 600px
     }
 
-    .fortune-col::before {
-      content: "";
-      position: absolute;
-      left: 6px;
-      right: 6px;
-      top: 6px;
-      height: 36%;
-      border-radius: 14px;
-      pointer-events: none;
-      z-index: 2;
-      background:
-        linear-gradient(180deg,
-          rgba(255, 255, 255, 0.56) 0%,
-          rgba(236, 244, 255, 0.18) 32%,
-          rgba(255, 255, 255, 0) 100%);
+    .shake-ov.show .qt-stage {
+      transform: scale(1) rotate(0);
+      opacity: 1
     }
 
-    .fortune-col::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: var(--mini-radius);
-      pointer-events: none;
-      z-index: 3;
-      box-shadow:
-        inset 0 1.2px 0 rgba(255, 255, 255, 0.68),
-        inset 1px 0 0 rgba(255, 255, 255, 0.10),
-        inset -1px 0 0 rgba(255, 255, 255, 0.08),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.06);
-    }
-
-    .fortune-col .fc-bg-img {
+    .qt-pic {
       width: 100%;
       display: block;
-      border-radius: var(--mini-radius);
       position: relative;
-      z-index: 1;
-      opacity: .92;
-      transform: scale(1.10);
-      transform-origin: center center;
+      z-index: 2;
+      filter: drop-shadow(0 12px 35px rgba(0, 0, 0, .65))
     }
 
-    .fortune-col .fc-content {
+    .sk-box {
       position: absolute;
+      top: -5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 55%;
+      height: 50%;
+      z-index: 1;
+      pointer-events: none
+    }
+
+    .sk-item {
+      position: absolute;
+      bottom: 0;
+      transform-origin: bottom center
+    }
+
+    .sk-item img {
+      height: clamp(70px, 20vw, 110px);
+      width: auto;
+      mix-blend-mode: multiply;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, .3))
+    }
+
+    .sk-item:nth-child(1) {
+      left: 5%;
+      transform: rotate(-15deg)
+    }
+
+    .sk-item:nth-child(2) {
+      left: 20%;
+      transform: rotate(-7deg)
+    }
+
+    .sk-item:nth-child(3) {
+      left: 37%;
+      transform: rotate(2deg)
+    }
+
+    .sk-item:nth-child(4) {
+      left: 54%;
+      transform: rotate(10deg)
+    }
+
+    .sk-item:nth-child(5) {
+      left: 70%;
+      transform: rotate(17deg)
+    }
+
+    .qt-base-glow {
+      position: absolute;
+      bottom: -15%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150%;
+      height: 30%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(255, 215, 0, .2) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0
+    }
+
+    .qt-label {
+      text-align: center;
+      margin-top: 18px;
+      color: rgba(255, 215, 0, .75);
+      font-size: 15px;
+      letter-spacing: 3px;
+      text-shadow: 0 0 12px rgba(255, 215, 0, .35);
+      opacity: 0;
+      transition: opacity .5s .3s
+    }
+
+    .shake-ov.show .qt-label {
+      opacity: 1
+    }
+
+    .qt-stage.shaking .qt-pic {
+      animation: qtS .32s ease-in-out 8;
+      transform-style: preserve-3d
+    }
+
+    @keyframes qtS {
+
+      0%,
+      100% {
+        transform: rotateZ(0) rotateY(0) translateY(0)
+      }
+
+      12% {
+        transform: rotateZ(-10deg) rotateY(-6deg) translateY(-6px)
+      }
+
+      28% {
+        transform: rotateZ(12deg) rotateY(7deg) translateY(-3px)
+      }
+
+      42% {
+        transform: rotateZ(-11deg) rotateY(-5deg) translateY(-7px)
+      }
+
+      56% {
+        transform: rotateZ(9deg) rotateY(6deg) translateY(-2px)
+      }
+
+      72% {
+        transform: rotateZ(-7deg) rotateY(-4deg) translateY(-5px)
+      }
+
+      86% {
+        transform: rotateZ(5deg) rotateY(3deg) translateY(-1px)
+      }
+    }
+
+    .qt-stage.shaking .sk-item {
+      animation: skB .16s ease-in-out 16 alternate
+    }
+
+    .qt-stage.shaking .sk-item:nth-child(odd) {
+      animation-delay: .03s
+    }
+
+    .qt-stage.shaking .sk-item:nth-child(even) {
+      animation-delay: .08s
+    }
+
+    @keyframes skB {
+      0% {
+        transform: rotate(var(--r, 0)) translateY(0)
+      }
+
+      100% {
+        transform: rotate(var(--r, 0)) translateY(-10px)
+      }
+    }
+
+    .qt-stage.shaking {
+      animation: stV .1s ease-in-out 25
+    }
+
+    @keyframes stV {
+
+      0%,
+      100% {
+        transform: scale(1) rotate(0)
+      }
+
+      25% {
+        transform: scale(1) rotate(-4deg)
+      }
+
+      75% {
+        transform: scale(1) rotate(4deg)
+      }
+    }
+
+    /* ========== 飞签 ========== */
+    .fly-stick {
+      position: fixed;
+      z-index: 65;
+      pointer-events: none;
+      opacity: 0;
+      left: 50%;
+      top: 38%
+    }
+
+    .fly-stick img {
+      height: clamp(100px, 28vw, 150px);
+      width: auto;
+      mix-blend-mode: multiply;
+      filter: drop-shadow(0 6px 18px rgba(0, 0, 0, .55))
+    }
+
+    .fly-stick.go {
+      animation: stkF 1.4s cubic-bezier(.2, .85, .3, 1) forwards
+    }
+
+    @keyframes stkF {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -20px) rotate(0)
+      }
+
+      12% {
+        opacity: 1;
+        transform: translate(-25px, -80px) rotate(-12deg)
+      }
+
+      30% {
+        opacity: 1;
+        transform: translate(15px, -130px) rotate(18deg)
+      }
+
+      50% {
+        opacity: 1;
+        transform: translate(35px, -70px) rotate(45deg)
+      }
+
+      70% {
+        opacity: 1;
+        transform: translate(50px, 10px) rotate(65deg)
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(60px, 140px) rotate(90deg)
+      }
+    }
+
+    /* ========== 底部操作栏 ========== */
+    .action-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 20;
+      padding: 0 12px clamp(16px, 4vw, 26px);
+      text-align: center
+    }
+
+    .cat-row {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 10px;
+      flex-wrap: wrap
+    }
+
+    .cat-btn {
+      padding: 5px 11px;
+      background: rgba(0, 0, 0, .32);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 18px;
+      color: rgba(255, 255, 255, .55);
+      font-size: 11px;
+      letter-spacing: 1px;
+      cursor: pointer;
+      font-family: inherit;
+      backdrop-filter: blur(4px);
+      transition: all .2s
+    }
+
+    .cat-btn:active {
+      transform: scale(.93)
+    }
+
+    .cat-btn.on {
+      background: rgba(255, 215, 0, .12);
+      border-color: rgba(255, 215, 0, .35);
+      color: #ffd700
+    }
+
+    .main-btn {
+      display: inline-block;
+      padding: 12px 38px;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, rgba(160, 110, 20, .4), rgba(255, 215, 0, .12));
+      border: 1.5px solid rgba(255, 215, 0, .5);
+      border-radius: 35px;
+      color: #ffd700;
+      font-size: clamp(15px, 4.2vw, 18px);
+      letter-spacing: 5px;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all .3s;
+      box-shadow: 0 0 20px rgba(255, 215, 0, .12), 0 4px 12px rgba(0, 0, 0, .3);
+      backdrop-filter: blur(6px);
+      animation: bP 2.5s ease-in-out infinite
+    }
+
+    .main-btn:active {
+      transform: scale(.94);
+      background: rgba(255, 215, 0, .28)
+    }
+
+    @keyframes bP {
+
+      0%,
+      100% {
+        box-shadow: 0 0 18px rgba(255, 215, 0, .1), 0 4px 12px rgba(0, 0, 0, .3)
+      }
+
+      50% {
+        box-shadow: 0 0 35px rgba(255, 215, 0, .3), 0 4px 12px rgba(0, 0, 0, .3)
+      }
+    }
+
+    .cnt {
+      font-size: 10px;
+      color: rgba(255, 255, 255, .28);
+      letter-spacing: 1px
+    }
+
+    /* ========== 粒子 ========== */
+    .pt-box {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 66
+    }
+
+    .pt {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0
+    }
+
+    .pt.go {
+      animation: ptF 1.3s ease-out forwards
+    }
+
+    @keyframes ptF {
+      0% {
+        opacity: 1;
+        transform: translate(0, 0) scale(1)
+      }
+
+      100% {
+        opacity: 0;
+        transform: translate(var(--tx), var(--ty)) scale(0)
+      }
+    }
+
+    .cf-box {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 67;
+      overflow: hidden
+    }
+
+    .cf {
+      position: absolute;
+      opacity: 0
+    }
+
+    .cf.go {
+      animation: cfD 3s ease-in forwards
+    }
+
+    @keyframes cfD {
+      0% {
+        opacity: 1;
+        transform: translateY(-15px) rotate(0)
+      }
+
+      100% {
+        opacity: 0;
+        transform: translateY(105vh) rotate(800deg)
+      }
+    }
+
+    /* ======================================================================
+   ★★★ 全新签文弹窗 —— 简约大气高级配色 ★★★
+   ====================================================================== */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0);
+      visibility: hidden;
+      transition: all .5s;
+      backdrop-filter: blur(0)
+    }
+
+    .overlay.show {
+      visibility: visible;
+      background: rgba(8, 5, 15, .82);
+      backdrop-filter: blur(18px)
+    }
+
+    .slip {
+      width: 88%;
+      max-width: 380px;
+      max-height: 92vh;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      position: relative;
+      border-radius: 20px;
+      transform: translateY(40px) scale(.92);
+      opacity: 0;
+      transition: all .6s cubic-bezier(.16, 1, .3, 1)
+    }
+
+    .overlay.show .slip {
+      transform: translateY(0) scale(1);
+      opacity: 1
+    }
+
+    /* 卡片背景 —— 深色磨砂玻璃 */
+    .slip-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      overflow: hidden;
+      background: linear-gradient(165deg,
+          rgba(28, 22, 38, .97) 0%,
+          rgba(22, 18, 32, .98) 40%,
+          rgba(18, 14, 28, .99) 100%);
+      box-shadow:
+        0 25px 60px rgba(0, 0, 0, .5),
+        0 0 0 1px rgba(255, 215, 0, .08),
+        inset 0 1px 0 rgba(255, 255, 255, .05);
+      backdrop-filter: blur(40px)
+    }
+
+    /* 顶部金色渐变条 */
+    .slip-bg::before {
+      content: '';
+      position: absolute;
+      top: 0;
       left: 0;
       right: 0;
-      bottom: 0;
-      z-index: 4;
-      padding: 0 10px 12px;
-      height: 58%;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #c9a84c 20%, #ffd700 50%, #c9a84c 80%, transparent);
+      opacity: .7
     }
 
-    .f-tag {
+    /* 底部微光 */
+    .slip-bg::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 10%;
+      right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 215, 0, .15), transparent)
+    }
+
+    /* 内容 */
+    .slip-body {
+      position: relative;
+      z-index: 3;
+      padding: clamp(28px, 7vw, 40px) clamp(20px, 5vw, 32px) clamp(24px, 6vw, 32px)
+    }
+
+    /* 类别徽章 */
+    .s-badge {
+      text-align: center;
+      margin-bottom: 16px
+    }
+
+    .s-badge span {
       display: inline-flex;
       align-items: center;
-      padding: 4px 9px;
-      border-radius: 16px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-      align-self: flex-start;
-      margin-bottom: 6px;
-      transform: translate(20px, -27px);
-      background: none !important;
-    }
-
-    .fortune-col.love .f-tag {
-      color: #d64f77;
-    }
-
-    .fortune-col.career .f-tag {
-      color: #3976bf;
-    }
-
-    .fortune-col.wealth .f-tag {
-      color: #b08425;
-    }
-
-    .f-desc {
-      font-size: 11.5px;
-      color: rgba(82, 90, 102, 0.94);
-      line-height: 1.6;
-      letter-spacing: 0.2px;
-      font-weight: 500;
-      transform: translate(0, -30px);
-    }
-
-    /* ========== 旅游推荐 ========== */
-    .dots {
-      display: flex;
       gap: 6px;
-      align-items: center;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 11px;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, rgba(201, 168, 76, .12), rgba(201, 168, 76, .04));
+      border: 1px solid rgba(201, 168, 76, .2);
+      color: rgba(201, 168, 76, .8)
     }
 
-    .dots i {
-      display: block;
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(178, 192, 220, 0.38);
-      font-style: normal;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    }
-
-    .dots i:first-child {
-      background: rgba(132, 150, 190, 0.68);
-    }
-
-    .travel-grid {
-      display: flex;
-      gap: 10px;
-    }
-
-    .travel-col {
-      flex: 1;
-      min-width: 0;
-      cursor: pointer;
-    }
-
-    .travel-col:active {
-      transform: scale(.98);
-      transition: transform .15s;
-    }
-
-    .travel-thumb {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 1/1;
-      border-radius: 18px;
-      overflow: hidden;
-      margin-bottom: 10px;
-      background: rgba(255, 255, 255, 0.12);
-      -webkit-backdrop-filter: blur(10px) saturate(105%);
-      backdrop-filter: blur(10px) saturate(105%);
-      border: 1px solid rgba(255, 255, 255, 0.26);
-      box-shadow:
-        0 5px 12px rgba(36, 46, 66, 0.06),
-        inset 0 1px 0 rgba(255, 255, 255, 0.48);
-    }
-
-    .travel-thumb::before {
-      content: "";
-      position: absolute;
-      left: 6px;
-      right: 6px;
-      top: 6px;
-      height: 28%;
-      border-radius: 12px;
-      pointer-events: none;
-      background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(236, 244, 255, 0));
-      z-index: 2;
-    }
-
-    .travel-thumb::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: 18px;
-      pointer-events: none;
-      box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.64),
-        inset 1px 0 0 rgba(255, 255, 255, 0.08),
-        inset -1px 0 0 rgba(255, 255, 255, 0.06);
-      z-index: 3;
-    }
-
-    .travel-thumb img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-    }
-
-    .travel-name {
-      font-size: 15px;
-      font-weight: 600;
-      color: rgba(24, 30, 38, 0.94);
+    /* 签号 */
+    .s-no {
       text-align: center;
-      letter-spacing: .2px;
+      font-size: 13px;
+      color: rgba(255, 255, 255, .35);
+      letter-spacing: 6px;
+      margin-bottom: 6px;
+      font-weight: 300
     }
 
-    /* ========== 响应式 ========== */
-    @media (min-width:431px) {
-      .page {
-        box-shadow: 0 0 50px rgba(0, 0, 0, 0.08);
+    /* 签等级 */
+    .s-lv {
+      text-align: center;
+      margin-bottom: 20px
+    }
+
+    .s-lv-text {
+      display: inline-block;
+      font-size: clamp(32px, 9vw, 42px);
+      font-weight: bold;
+      letter-spacing: 12px;
+      background: linear-gradient(180deg, #fff8e1 0%, #ffd700 40%, #c9a84c 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(255, 215, 0, .3))
+    }
+
+    .s-lv.mid .s-lv-text {
+      background: linear-gradient(180deg, #e8dcc8 0%, #c9a84c 40%, #8b7335 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 6px rgba(201, 168, 76, .2))
+    }
+
+    .s-lv.bad .s-lv-text {
+      background: linear-gradient(180deg, #c8b8a0 0%, #8b7335 40%, #6b5a2e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(139, 115, 53, .15))
+    }
+
+    /* 分割线 */
+    .s-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 0 auto 22px;
+      width: 80%
+    }
+
+    .s-line::before,
+    .s-line::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201, 168, 76, .2), transparent)
+    }
+
+    .s-line i {
+      font-style: normal;
+      color: rgba(201, 168, 76, .35);
+      font-size: 8px
+    }
+
+    /* 签诗 */
+    .s-poem {
+      text-align: center;
+      margin-bottom: 22px
+    }
+
+    .s-poem p {
+      margin: 0;
+      color: rgba(255, 252, 240, .85);
+      font-size: clamp(16px, 4.5vw, 19px);
+      line-height: 2.4;
+      letter-spacing: 4px;
+      font-weight: 400;
+      opacity: 0;
+      animation: pmI .6s ease forwards
+    }
+
+    .s-poem p:nth-child(1) {
+      animation-delay: .15s
+    }
+
+    .s-poem p:nth-child(2) {
+      animation-delay: .4s
+    }
+
+    .s-poem p:nth-child(3) {
+      animation-delay: .65s
+    }
+
+    .s-poem p:nth-child(4) {
+      animation-delay: .9s
+    }
+
+    @keyframes pmI {
+      to {
+        opacity: 1
       }
     }
 
-    @media (max-width:374px) {
-      .top-spacer {
-        height: 52vw
+    /* 解签区 */
+    .s-explain-box {
+      position: relative;
+      margin: 0 auto 20px;
+      padding: 16px 18px;
+      background: linear-gradient(135deg, rgba(201, 168, 76, .06), rgba(201, 168, 76, .02));
+      border-radius: 12px;
+      border: 1px solid rgba(201, 168, 76, .1)
+    }
+
+    .s-explain-box::before {
+      content: '📜';
+      position: absolute;
+      top: -10px;
+      left: 16px;
+      font-size: 16px;
+      background: rgba(28, 22, 38, .97);
+      padding: 0 6px
+    }
+
+    .s-exp {
+      color: rgba(255, 252, 240, .6);
+      font-size: 13px;
+      line-height: 2;
+      letter-spacing: .5px;
+      opacity: 0;
+      animation: exI .8s 1.2s ease forwards
+    }
+
+    @keyframes exI {
+      to {
+        opacity: 1
+      }
+    }
+
+    /* 印章 */
+    .s-seal {
+      position: absolute;
+      top: 12px;
+      right: 14px;
+      width: 38px;
+      height: 38px;
+      border: 1.5px solid rgba(180, 60, 60, .35);
+      border-radius: 3px;
+      color: rgba(180, 60, 60, .4);
+      font-size: 11px;
+      line-height: 17px;
+      text-align: center;
+      padding: 2px;
+      transform: rotate(-12deg);
+      font-weight: bold;
+      letter-spacing: 1px;
+      opacity: 0;
+      animation: sealI .5s 1.5s ease forwards
+    }
+
+    @keyframes sealI {
+      to {
+        opacity: 1
+      }
+    }
+
+    /* 按钮组 */
+    .s-btns {
+      margin-top: 8px
+    }
+
+    .s-btn {
+      display: block;
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 14px;
+      letter-spacing: 3px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all .2s;
+      text-align: center
+    }
+
+    .btn-ok {
+      background: linear-gradient(135deg, #c9a84c, #a08530);
+      border: none;
+      color: #1a1420;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(201, 168, 76, .25)
+    }
+
+    .btn-ok:active {
+      transform: scale(.97);
+      box-shadow: 0 2px 8px rgba(201, 168, 76, .3)
+    }
+
+    .btn-re {
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid rgba(255, 255, 255, .1);
+      color: rgba(255, 255, 255, .5);
+      font-size: 13px
+    }
+
+    .btn-re:active {
+      background: rgba(255, 255, 255, .08);
+      transform: scale(.97)
+    }
+
+    .btn-cp {
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, .25);
+      font-size: 12px;
+      letter-spacing: 2px;
+      padding: 8px
+    }
+
+    .btn-cp:active {
+      color: rgba(201, 168, 76, .6)
+    }
+
+    /* ========== 适配 ========== */
+    @media(max-height:700px) {
+      .hotspot {
+        bottom: 18%;
+        width: 50vw;
+        height: 40vw
       }
 
-      .w-temp {
-        font-size: 26px
+      .bub {
+        top: 55px
       }
+    }
 
-      .g-card {
-        padding: 18px 14px 20px;
-        margin: 0 12px 12px
+    @media(min-height:850px) {
+      .hotspot {
+        bottom: 26%;
+        width: 52vw;
+        height: 44vw
       }
+    }
 
-      .weather-card {
-        margin: 0 12px 12px
-      }
-
-      .f-tag {
-        font-size: 10.5px !important;
-        padding: 3px 7px !important
-      }
-
-      .f-desc {
-        font-size: 10.5px
-      }
-
-      .travel-name {
-        font-size: 13px
-      }
-
-      .card-hd-title {
-        font-size: 18px
+    @media(min-height:920px) {
+      .hotspot {
+        bottom: 28%;
+        height: 46vw
       }
     }
   </style>
@@ -595,170 +1067,268 @@
 
 <body>
 
-  <div class="page">
+  <div class="bg">
+    <div class="bg-img"></div>
+    <div class="bg-top"></div>
+    <div class="bg-bot"></div>
+    <div class="bg-glow"></div>
+    <div class="gold-box" id="goldBox"></div>
+  </div>
 
-    <div class="page-bg">
-      <img src="assets/bg-full.jpg" alt="背景">
-    </div>
+  <header class="header">
+    <div class="h1">🐉 小龙王灵签 🐉</div>
+    <div class="h2">✦ 诚心默念所求 · 龙王指引迷津 ✦</div>
+  </header>
 
-    <div class="content">
-      <div class="top-spacer"></div>
+  <button class="snd" id="sndBtn" onclick="togSnd()">🔊</button>
+  <div class="bub" id="bub">点击小龙王手里的签筒开始求签 🐲</div>
 
-      <!-- 天气卡片 -->
-      <div class="weather-card">
-        <div class="card-bg">
-          <img src="assets/weather-bg.png" alt="">
-        </div>
-        <div class="weather-body">
-          <div class="w-loc">
-            <span class="city">威海</span>
-          </div>
-          <div class="w-temp" id="temperature"></div>
-          <div class="w-detail">
-            <span id="windDirection"></span>
-            <span class="sep">丨</span>
-            <span id="humidity"></span>
-            <span class="trend">
-              <svg viewBox="0 0 16 16" fill="none">
-                <path d="M4 12L12 4M12 4H6M12 4V10" stroke="#96a8c6" stroke-width="1.8" stroke-linecap="round"
-                  stroke-linejoin="round" />
-              </svg>
-            </span>
-          </div>
-        </div>
+  <div class="hotspot" id="hotspot" onclick="clickHotspot()">
+    <div class="hs-glow"></div>
+    <div class="hs-rip" id="hsRip"></div>
+    <div class="hs-rip2" id="hsRip2"></div>
+    <div class="hs-txt">👆 点击签筒求签</div>
+  </div>
+
+  <div class="shake-ov" id="shakeOv">
+    <div class="qt-stage" id="qtStage">
+      <div class="qt-base-glow"></div>
+      <div class="sk-box">
+        <div class="sk-item" style="--r:-15deg"><img src="qianzi.png" alt></div>
+        <div class="sk-item" style="--r:-7deg"><img src="qianzi.png" alt></div>
+        <div class="sk-item" style="--r:2deg"><img src="qianzi.png" alt></div>
+        <div class="sk-item" style="--r:10deg"><img src="qianzi.png" alt></div>
+        <div class="sk-item" style="--r:17deg"><img src="qianzi.png" alt></div>
       </div>
-
-      <!-- 今日运势 -->
-      <div class="g-card">
-        <span class="lg-base"></span>
-        <span class="lg-specular"></span>
-        <span class="lg-caustic"></span>
-        <span class="lg-edge"></span>
-        <span class="lg-rim"></span>
-
-        <div class="card-hd">
-          <div class="card-hd-title">
-            <span class="ico">
-              <svg viewBox="0 0 24 24" width="24" height="24">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                       2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
-                       C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
-                       c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#F06292" />
-              </svg>
-            </span>
-            <span>今日运势</span>
-          </div>
-          <button class="card-more" onclick="location.href='wenqian.html'">问龙王<span class="arr">›</span></button>
-        </div>
-
-        <div class="fortune-grid">
-          <div class="fortune-col love">
-            <img class="fc-bg-img" src="assets/fortune-love-bg.png" alt="">
-            <div class="fc-content">
-              <div class="f-tag">爱情</div>
-              <div class="f-desc">今天是个充满浪漫的日子</div>
-            </div>
-          </div>
-
-          <div class="fortune-col career">
-            <img class="fc-bg-img" src="assets/fortune-career-bg.png" alt="">
-            <div class="fc-content">
-              <div class="f-tag">事业</div>
-              <div class="f-desc">需要沉稳应对职务变化</div>
-            </div>
-          </div>
-
-          <div class="fortune-col wealth">
-            <img class="fc-bg-img" src="assets/fortune-wealth-bg.png" alt="">
-            <div class="fc-content">
-              <div class="f-tag">财运</div>
-              <div class="f-desc">今天有不错的投资机会</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 旅游推荐 — 威海本地景点 -->
-      <div class="g-card">
-        <span class="lg-base"></span>
-        <span class="lg-specular"></span>
-        <span class="lg-caustic"></span>
-        <span class="lg-edge"></span>
-        <span class="lg-rim"></span>
-
-        <div class="card-hd">
-          <div class="card-hd-title">
-            <span class="ico">
-              <svg viewBox="0 0 24 24" width="24" height="24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
-                       10-4.48 10-10S17.52 2 12 2zm-1 17.93
-                       c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79
-                       L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54
-                       c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1
-                       H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41
-                       c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#E8A44E" />
-              </svg>
-            </span>
-            <span>旅游推荐</span>
-          </div>
-          <div class="dots"><i></i><i></i><i></i></div>
-        </div>
-
-        <div class="travel-grid">
-
-          <!-- 威海·刘公岛 -->
-          <div class="travel-col">
-            <div class="travel-thumb">
-              <img src="assets/img-beijing.png" alt="刘公岛">
-            </div>
-            <div class="travel-name">威海·刘公岛</div>
-          </div>
-
-          <!-- 威海·成山头 -->
-          <div class="travel-col">
-            <div class="travel-thumb">
-              <img src="assets/img-shanghai.png" alt="成山头">
-            </div>
-            <div class="travel-name">威海·成山头</div>
-          </div>
-
-          <!-- 威海·华夏城 -->
-          <div class="travel-col">
-            <div class="travel-thumb">
-              <img src="assets/img-xian.png" alt="华夏城">
-            </div>
-            <div class="travel-name">威海·华夏城</div>
-          </div>
-
-        </div>
-      </div>
-
-      <div style="height:30px"></div>
+      <img class="qt-pic" src="qiantong.png" alt="签筒" draggable="false">
+      <div class="qt-label">🙏 龙王正在为你摇签…</div>
     </div>
   </div>
-</body>
-<script type="text/javascript">
-  window._AMapSecurityConfig = {
-    securityJsCode: "a1e45b3fe32357e83c1d049d7a59bc6a",
-  };
-</script>
-<script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=344345526ae85041418d2af9dd558b5f"></script>
-<script type="text/javascript">
-  //加载天气查询插件
-  AMap.plugin('AMap.Weather', function () {
-    //创建天气查询实例
-    var weather = new AMap.Weather();
 
-    //执行实时天气信息查询
-    weather.getLive('威海市', function (err, data) {
-      if (!err) {
-        document.getElementById("temperature").innerText = data.temperature + "°C";
-        document.getElementById("windDirection").innerText = data.windDirection + "风" + data.windPower + "级";
-        document.getElementById("humidity").innerText = "湿度 " + data.humidity;
-        console.log(err, data);
-      }
+  <div class="fly-stick" id="flyStk"><img src="qianzi.png" alt draggable="false"></div>
+  <div class="pt-box" id="ptBox"></div>
+  <div class="cf-box" id="cfBox"></div>
+
+  <div class="action-bar">
+    <div class="cat-row">
+      <button class="cat-btn on" onclick="selCat(this,'综合')">🔮综合</button>
+      <button class="cat-btn" onclick="selCat(this,'姻缘')">💕姻缘</button>
+      <button class="cat-btn" onclick="selCat(this,'事业')">💼事业</button>
+      <button class="cat-btn" onclick="selCat(this,'财运')">💰财运</button>
+      <button class="cat-btn" onclick="selCat(this,'学业')">📚学业</button>
+      <button class="cat-btn" onclick="selCat(this,'健康')">💪健康</button>
+    </div>
+    <button class="main-btn" id="mainBtn" onclick="clickHotspot()">🙏 摇签求卦</button>
+    <div class="cnt">今日已有 <span id="cntN">2,358</span> 人虔诚求签</div>
+  </div>
+
+  <!-- ★★ 全新结果弹窗 ★★ -->
+  <div class="overlay" id="ov" onclick="ovTap(event)">
+    <div class="slip" onclick="event.stopPropagation()">
+      <div class="slip-bg"></div>
+      <div class="slip-body">
+        <div class="s-badge"><span id="sCat">🔮 综合运势</span></div>
+        <div class="s-no" id="sNo">第一签</div>
+        <div class="s-lv" id="sLvWrap"><span class="s-lv-text" id="sLv">上上签</span></div>
+        <div class="s-line"><i>◆</i></div>
+        <div class="s-poem" id="sPm"></div>
+        <div class="s-line"><i>◆</i></div>
+        <div class="s-explain-box">
+          <div class="s-seal" id="sSeal">龙王赐签</div>
+          <div class="s-exp" id="sEx"></div>
+        </div>
+        <div class="s-btns">
+          <button class="s-btn btn-ok" onclick="closeR()">知晓天意</button>
+          <button class="s-btn btn-re" onclick="goIndex()">回首页</button>
+          <button class="s-btn btn-re" onclick="again()">🔄 再求一签</button>
+          <button class="s-btn btn-cp" id="cpBtn" onclick="copyF()">复制签文分享</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ================================================================
+       ★ 49签 —— 按类别分组，确保类别对应 ★
+       ================================================================ */
+    const QS = {
+      "综合": [
+        { n: "第一签", lv: "上上签", lc: "good", pm: ["龙腾四海风云会", "凤舞九天日月明", "万事亨通皆如意", "金玉满堂福禄增"], ex: "大吉！龙王亲赐鸿福，诸事皆顺。近日行事大胆无妨，贵人暗中相助，所求必得，所愿必成。" },
+        { n: "第二签", lv: "上上签", lc: "good", pm: ["春风得意马蹄疾", "一朝看尽长安花", "鹏程万里青云上", "富贵荣华耀我家"], ex: "极吉！运势如日中天，事业爱情双丰收。把握良机勇往直前，前途不可限量。" },
+        { n: "第三签", lv: "上签", lc: "good", pm: ["顺风顺水好行舟", "前路光明不用愁", "贵人指引方向明", "步步生莲上高楼"], ex: "吉签。运势上升期凡事顺遂。有贵人相助指点迷津，宜积极进取。" },
+        { n: "第四签", lv: "上签", lc: "good", pm: ["枯木逢春再发芽", "失而复得莫惊讶", "守得云开见月明", "柳暗花明又一家"], ex: "吉签。否极泰来之兆。之前失去的会以另一种方式回来，坚持就是胜利。" },
+        { n: "第五签", lv: "中吉", lc: "mid", pm: ["水到渠成自然事", "花开花落有定时", "凡事不必太着急", "静待佳音自会知"], ex: "中吉。事情正朝好的方向发展，只是需要时间。顺其自然，不必心急。" },
+        { n: "第六签", lv: "中签", lc: "mid", pm: ["平平淡淡才是真", "不骄不躁守本心", "知足常乐最为贵", "随遇而安度光阴"], ex: "中平。运势平稳无大波。知足常乐，珍惜眼前拥有的，平安即是福。" },
+        { n: "第七签", lv: "中签", lc: "mid", pm: ["得失之间细思量", "莫为虚名累心肠", "脚踏实地做实事", "平安就是大吉祥"], ex: "中平。不要太在意得失。踏踏实实做好本分，平安就是最大的幸福。" },
+        { n: "第八签", lv: "下签", lc: "bad", pm: ["乌云蔽日暂无光", "寒风萧瑟心彷徨", "但知黑夜终有尽", "黎明破晓在前方"], ex: "运势较低迷但黑暗是暂时的。保持耐心和信心，不做重大决定，等待转机。" }
+      ],
+      "姻缘": [
+        { n: "姻缘第一签", lv: "上上签", lc: "good", pm: ["月老红线早已牵", "鸳鸯戏水乐无边", "有缘千里来相会", "佳偶天成福绵绵"], ex: "大吉！姻缘天注定，你的那个Ta就在不远处。单身者近期桃花运极旺，已有伴者感情甜蜜如初。" },
+        { n: "姻缘第二签", lv: "上签", lc: "good", pm: ["良辰美景好时光", "佳偶天成喜洋洋", "但凡心诚事必遂", "和和美美庆满堂"], ex: "吉签！感情运势极佳。单身者有望遇到心仪之人，有伴者感情更上层楼，宜主动表达爱意。" },
+        { n: "姻缘第三签", lv: "上签", lc: "good", pm: ["桃花朵朵开满枝", "蜂蝶纷飞好时期", "有缘之人终相聚", "莫让良缘空错离"], ex: "吉签，主桃花大旺。近期有良缘出现，留意身边之人。缘分稍纵即逝，要珍惜把握。" },
+        { n: "姻缘第四签", lv: "上签", lc: "good", pm: ["龙凤呈祥喜事临", "携手白头终不悔", "比翼双飞天地间", "此生有你便是春"], ex: "吉签！感情运势大好，有望迎来重要进展。珍惜眼前人，用心经营，幸福触手可及。" },
+        { n: "姻缘第五签", lv: "中吉", lc: "mid", pm: ["好花还需绿叶配", "姻缘注定莫心焦", "你侬我侬终有日", "耐心等待缘来到"], ex: "中吉。良缘虽好但需等待，不要太着急。保持最好的自己，缘分自然来敲门。" },
+        { n: "姻缘第六签", lv: "中签", lc: "mid", pm: ["花开堪折直须折", "莫待无花空折枝", "有心栽花花不发", "无心插柳柳成荫"], ex: "中平。感情之事不可强求。刻意追求反而不美，放松心态随缘而行，反而能遇到对的人。" },
+        { n: "姻缘第七签", lv: "中平", lc: "mid", pm: ["感情之事莫强求", "有缘无缘天注定", "与其苦苦去追寻", "不如放手等花期"], ex: "中平。目前感情方面不宜强求。给自己一些时间沉淀，对的人会在对的时间出现。" },
+        { n: "姻缘第八签", lv: "下签", lc: "bad", pm: ["感情波折心意乱", "剪不断来理还乱", "不如暂且放一放", "时间会给你答案"], ex: "感情方面有波折。不要在情绪激动时做决定，给自己和对方一些空间与时间冷静。" }
+      ],
+      "事业": [
+        { n: "事业第一签", lv: "上上签", lc: "good", pm: ["蛟龙出海势冲天", "鹏程万里在眼前", "贵人相助前途阔", "功名富贵两双全"], ex: "大吉！事业运势极佳，有贵人鼎力相助。升迁加薪都有望，抓住机会大胆前行，前途无量！" },
+        { n: "事业第二签", lv: "上签", lc: "good", pm: ["龙游浅水待时机", "蓄势待发正当期", "一朝风云际会时", "扶摇直上九万里"], ex: "吉签。你正处于蓄力阶段，之前的努力即将得到回报。保持耐心，大展宏图的时机即将到来。" },
+        { n: "事业第三签", lv: "上签", lc: "good", pm: ["金榜题名时运到", "十年寒窗终有报", "学业事业皆顺遂", "前程似锦乐逍遥"], ex: "吉签！付出终有回报。近期有重要的事业突破机会，面试、竞标、项目都大有可为。" },
+        { n: "事业第四签", lv: "上签", lc: "good", pm: ["海阔凭鱼跃千里", "天高任鸟展翅飞", "功名终有扬眉日", "莫叹时运来得迟"], ex: "吉签。天地广阔任你施展。虽然暂时还未到高光时刻，但你的能力终会被看见和认可。" },
+        { n: "事业第五签", lv: "中吉", lc: "mid", pm: ["好事多磨须忍耐", "厚积薄发待时来", "脚踏实地勤耕耘", "水到渠成功自开"], ex: "中吉。事业发展需要稳扎稳打。做好本职工作，积累经验和人脉，时机成熟自然水到渠成。" },
+        { n: "事业第六签", lv: "中签", lc: "mid", pm: ["宜守不宜攻为上", "宜静不宜动方长", "时机未到莫强求", "龙潜深渊待时光"], ex: "中平。事业方面目前不宜有大动作。以守为攻，韬光养晦，等待更好的时机再出手。" },
+        { n: "事业第七签", lv: "中平", lc: "mid", pm: ["合作共事须谨慎", "君子之交淡如水", "利益面前看人心", "识人辨事保安身"], ex: "中平。职场合作需要谨慎，不要轻信他人的承诺。看清局势保护好自己的利益。" },
+        { n: "事业第八签", lv: "下签", lc: "bad", pm: ["逆水行舟不进退", "事事不顺心烦累", "此时宜退不宜进", "蛰伏等待好时机"], ex: "事业运势低迷，不宜冒进跳槽或创业。此时以退为进，韬光养晦，默默提升实力等待东风。" }
+      ],
+      "财运": [
+        { n: "财运第一签", lv: "上上签", lc: "good", pm: ["财源滚滚如潮来", "金银满堂福门开", "龙王赐宝添财运", "日进斗金喜开怀"], ex: "大吉！财运亨通，近期有意外之财。正财偏财俱旺，投资理财都有不错的回报，但仍需理性不贪。" },
+        { n: "财运第二签", lv: "上签", lc: "good", pm: ["财源广进如水流", "左右逢源不用愁", "正财偏财皆可得", "富贵盈门乐悠悠"], ex: "吉签！正财稳健收入可观，偏财也有意外收获。适合进行稳健的投资理财，财富稳步增长。" },
+        { n: "财运第三签", lv: "上签", lc: "good", pm: ["东海龙宫宝藏丰", "有缘之人自相逢", "近期财运正当旺", "抓住时机莫放松"], ex: "吉签！近期有不错的赚钱机会出现，要善于发现和把握。行动力是关键，莫犹豫。" },
+        { n: "财运第四签", lv: "中吉", lc: "mid", pm: ["细水长流终成海", "积少成多富自来", "勤俭持家根基稳", "财运亨通路自开"], ex: "中吉。正财运不错，踏实工作必有丰厚回报。理财方面宜稳健保守，日积月累终成大富。" },
+        { n: "财运第五签", lv: "中吉", lc: "mid", pm: ["投资理财须谨慎", "小心驶得万年船", "量力而行莫冒进", "细水长流聚财源"], ex: "中吉。财运尚可但不宜冒险。量入为出理性消费，避免冲动投资，稳健为上。" },
+        { n: "财运第六签", lv: "中签", lc: "mid", pm: ["莫贪一时之小利", "放长线钓大鱼儿", "稳中求进方为上", "财来财去需谨记"], ex: "中平。财运平稳但需注意节流。不要贪小便宜，目光放长远，细水长流方能聚财。" },
+        { n: "财运第七签", lv: "中平", lc: "mid", pm: ["破财消灾非坏事", "退一步来海阔天", "眼前损失不必愁", "塞翁失马焉知福"], ex: "中平。可能有小的财务损失，但破财消灾未必是坏事。换个角度看，也许是因祸得福。" },
+        { n: "财运第八签", lv: "下签", lc: "bad", pm: ["投资失利莫追加", "止损方能保根基", "贪心不足蛇吞象", "知错能改善莫大"], ex: "财运不佳，切忌贪心冒险。已有损失要及时止损，千万不要试图翻本加仓。保住本金最重要。" }
+      ],
+      "学业": [
+        { n: "学业第一签", lv: "上上签", lc: "good", pm: ["十年寒窗终有成", "金榜题名天下知", "龙王赐福学业旺", "才高八斗步青云"], ex: "大吉！学业运势极佳，考试运特别好。近期学习效率极高，适合冲刺复习和参加重要考试，必能取得优异成绩。" },
+        { n: "学业第二签", lv: "上签", lc: "good", pm: ["书山有路勤为径", "学海无涯苦作舟", "功夫不负有心人", "前程似锦满庭秋"], ex: "吉签。学业之路虽然辛苦，但你的努力不会白费。保持专注和勤奋，好成绩自然会来。" },
+        { n: "学业第三签", lv: "上签", lc: "good", pm: ["龙门鱼跃今朝事", "笔下生花非等闲", "只待东风来送暖", "春榜高中在眼前"], ex: "吉签！学业上即将迎来突破，近期考试运不错。把握复习重点，信心满满迎接挑战。" },
+        { n: "学业第四签", lv: "中吉", lc: "mid", pm: ["学如逆水行舟行", "不进则退须自警", "方法得当事半功", "持之以恒终有成"], ex: "中吉。学业需要持之以恒，找到适合自己的方法很重要。不要三天打鱼两天晒网。" },
+        { n: "学业第五签", lv: "中吉", lc: "mid", pm: ["春种秋收有定数", "勤劳耕耘不虚度", "每日精进一小步", "来日回首大不同"], ex: "中吉。现在的每一分努力都在为未来铺路。不要着急看到成果，积累到一定程度自然质变。" },
+        { n: "学业第六签", lv: "中签", lc: "mid", pm: ["莫道学问深似海", "一步一步总能来", "心浮气躁难成事", "静心修学方为才"], ex: "中平。学习需要静下心来，不可急于求成。远离手机和诱惑，专注投入方能有所收获。" },
+        { n: "学业第七签", lv: "中平", lc: "mid", pm: ["求学之路多坎坷", "方法不对白忙活", "静心反思找原因", "调整方向再开拓"], ex: "中平。学业方面需要反思方法是否正确。方向对了努力才有价值，考虑换个学习策略试试。" },
+        { n: "学业第八签", lv: "下签", lc: "bad", pm: ["心猿意马难静坐", "杂念纷飞学不进", "此时不宜急攻克", "调整心态再出发"], ex: "学业运势暂时低迷。可能是心态浮躁无法集中精力，建议先调整好状态再投入学习，事半功倍。" }
+      ],
+      "健康": [
+        { n: "健康第一签", lv: "上上签", lc: "good", pm: ["百病消散如云烟", "身轻体健赛神仙", "龙王庇佑保平安", "健康长寿福无边"], ex: "大吉！健康运势极佳。身体状态非常好，精力充沛。之前困扰的健康小问题也会逐渐好转消失。" },
+        { n: "健康第二签", lv: "上签", lc: "good", pm: ["龙体安康万事兴", "起居有常百病轻", "心宽体胖乐逍遥", "长命百岁享太平"], ex: "吉签。整体健康状况良好，保持规律作息即可。心情愉快就是最好的养生之道。" },
+        { n: "健康第三签", lv: "上签", lc: "good", pm: ["晨起运动精神爽", "膳食均衡体自强", "龙王赐福保安康", "身心康泰乐无疆"], ex: "吉签。健康运势不错，适合开始新的运动计划。饮食注意均衡营养，身体会越来越好。" },
+        { n: "健康第四签", lv: "中吉", lc: "mid", pm: ["贵人暗中来相助", "逢凶化吉保平安", "虽有小恙不足虑", "调养得当自然安"], ex: "中吉。即使有小毛病也不必担忧，在贵人（好医生）帮助下会很快恢复。注意按时调养。" },
+        { n: "健康第五签", lv: "中签", lc: "mid", pm: ["身体发肤需珍重", "劳逸结合保安宁", "小恙无碍休惊慌", "调养得当自然轻"], ex: "中平。注意劳逸结合不要过度劳累。如有小不适不必过于担心，注意休息和调养即可。" },
+        { n: "健康第六签", lv: "中平", lc: "mid", pm: ["身体小恙须留意", "莫因忙碌误健康", "适当休息多运动", "养好精神再出发"], ex: "中平。身体在发出信号提醒你注意健康。不要为了工作学业忽视身体，适当放慢脚步。" },
+        { n: "健康第七签", lv: "下签", lc: "bad", pm: ["健康亮起黄灯了", "切莫讳疾而忌医", "及时就医遵医嘱", "调养身心最重要"], ex: "注意！身体健康需要重视。不要忽视身体发出的警示信号，及时就医检查，遵从医嘱好好调养。" }
+      ]
+    };
+
+    const CAT_ICONS = { "综合": "🔮", "姻缘": "💕", "事业": "💼", "财运": "💰", "学业": "📚", "健康": "💪" };
+    const CAT_NAMES = { "综合": "综合运势", "姻缘": "姻缘桃花", "事业": "事业仕途", "财运": "财运亨通", "学业": "学业功名", "健康": "健康平安" };
+
+    /* ============ 音效 ============ */
+    let AC = null, sndOn = true;
+    function ac() { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); return AC }
+    function togSnd() { sndOn = !sndOn; document.getElementById('sndBtn').textContent = sndOn ? '🔊' : '🔇' }
+    function sfxKnock() { if (!sndOn) return; const c = ac(), t = c.currentTime; const o = c.createOscillator(), g = c.createGain(); o.type = 'triangle'; o.frequency.setValueAtTime(850, t); o.frequency.exponentialRampToValueAtTime(130, t + .09); g.gain.setValueAtTime(.38, t); g.gain.exponentialRampToValueAtTime(.001, t + .13); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .16); const b = c.createBuffer(1, c.sampleRate * .05, c.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++)d[i] = (Math.random() * 2 - 1) * Math.exp(-i / (d.length * .12)); const s = c.createBufferSource(), ng = c.createGain(), nf = c.createBiquadFilter(); s.buffer = b; nf.type = 'bandpass'; nf.frequency.value = 3500; nf.Q.value = 1.5; ng.gain.setValueAtTime(.22, t); ng.gain.exponentialRampToValueAtTime(.001, t + .07); s.connect(nf); nf.connect(ng); ng.connect(c.destination); s.start(t) }
+    function sfxShake(dur) { if (!sndOn) return; const c = ac(), cnt = Math.floor(dur / .09); for (let i = 0; i < cnt; i++) { const t = c.currentTime + i * .09; const b = c.createBuffer(1, c.sampleRate * .035, c.sampleRate), d = b.getChannelData(0); for (let j = 0; j < d.length; j++)d[j] = (Math.random() * 2 - 1) * .14 * Math.exp(-j / (d.length * .22)); const s = c.createBufferSource(), g = c.createGain(), f = c.createBiquadFilter(); s.buffer = b; f.type = 'highpass'; f.frequency.value = 2800 + Math.random() * 2200; g.gain.setValueAtTime(.08 + Math.random() * .06, t); g.gain.exponentialRampToValueAtTime(.001, t + .045); s.connect(f); f.connect(g); g.connect(c.destination); s.start(t) } }
+    function sfxDrop() { if (!sndOn) return; const c = ac(), t = c.currentTime; const o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(520, t); o.frequency.exponentialRampToValueAtTime(85, t + .32); g.gain.setValueAtTime(.28, t); g.gain.exponentialRampToValueAtTime(.001, t + .36); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .4) }
+    function sfxChime() { if (!sndOn) return; const c = ac(), t = c.currentTime;[523, 659, 784, 1047].forEach((f, i) => { const o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(f, t + i * .11); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.13, t + i * .11); g.gain.setValueAtTime(.13, t + i * .11); g.gain.exponentialRampToValueAtTime(.001, t + i * .11 + 2.2); o.connect(g); g.connect(c.destination); o.start(t + i * .11); o.stop(t + i * .11 + 2.8) }) }
+    function sfxGong() { if (!sndOn) return; const c = ac(), t = c.currentTime; const o = c.createOscillator(), g = c.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(170, t); o.frequency.linearRampToValueAtTime(150, t + .6); g.gain.setValueAtTime(.34, t); g.gain.exponentialRampToValueAtTime(.001, t + 3.2); o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + 3.6); const o2 = c.createOscillator(), g2 = c.createGain(); o2.type = 'sine'; o2.frequency.setValueAtTime(340, t); g2.gain.setValueAtTime(.1, t); g2.gain.exponentialRampToValueAtTime(.001, t + 2); o2.connect(g2); g2.connect(c.destination); o2.start(t); o2.stop(t + 2.5) }
+
+    /* ============ 粒子 ============ */
+    function emitPt(cx, cy, n, cs) { const bx = document.getElementById('ptBox'); for (let i = 0; i < n; i++) { const e = document.createElement('div'); e.className = 'pt'; const a = (Math.PI * 2 * i) / n + Math.random() * .5, dist = 45 + Math.random() * 85; const tx = Math.cos(a) * dist, ty = Math.sin(a) * dist, sz = 3 + Math.random() * 5; e.style.cssText = `left:${cx}px;top:${cy}px;width:${sz}px;height:${sz}px;background:${cs[~~(Math.random() * cs.length)]};--tx:${tx}px;--ty:${ty}px`; bx.appendChild(e); requestAnimationFrame(() => e.classList.add('go')); setTimeout(() => e.remove(), 1500) } }
+    function emitCf(n) { const bx = document.getElementById('cfBox'); const cs = ['#ffd700', '#ff6b6b', '#74b9ff', '#00b894', '#fdcb6e', '#e17055', '#a29bfe', '#fd79a8']; for (let i = 0; i < n; i++) { const e = document.createElement('div'); e.className = 'cf'; const sz = 4 + Math.random() * 7; e.style.cssText = `left:${Math.random() * 100}%;width:${sz}px;height:${sz * 1.5}px;background:${cs[~~(Math.random() * cs.length)]};animation-delay:${Math.random() * 1.5}s;animation-duration:${2 + Math.random() * 2}s;border-radius:${Math.random() > .5 ? '50%' : '2px'}`; bx.appendChild(e); requestAnimationFrame(() => e.classList.add('go')); setTimeout(() => e.remove(), 5000) } }
+    function initGold() { const bx = document.getElementById('goldBox'); for (let i = 0; i < 12; i++) { const e = document.createElement('div'); e.className = 'gp'; const sz = 2 + Math.random() * 3; e.style.cssText = `left:${Math.random() * 100}%;width:${sz}px;height:${sz}px;animation-duration:${7 + Math.random() * 9}s;animation-delay:${Math.random() * 12}s`; bx.appendChild(e) } }
+
+    /* ============ 核心 ============ */
+    let busy = false, curCat = '综合', curF = null;
+    const SAY = {
+      idle: ['点击小龙王手里的签筒求签 🐲', '心诚则灵～想好要问的事 ✨', '嘿嘿，本龙王的签可准了！', '今日海风正好，宜求签问卦～ 🏖️', '来嘛来嘛，点签筒试试～ 🎋', '诚心默念再点签筒哦 🙏'],
+      shake: ['摇啊摇～ 签要出来啦！🎋', '嗯嗯…本龙王正在感应…🔮', '哗啦哗啦～ 好签在哪里 ✨', '让本龙王看看你的命数…🐉'],
+      result: ['签出来了！快看龙王的启示～', '嘿嘿本龙王觉得这签有意思！', '天机已现好好参悟吧～ 🐲', '龙王赐签诚心领受 ✨']
+    };
+    const rnd = a => a[~~(Math.random() * a.length)];
+    function showBub(t) { const b = document.getElementById('bub'); b.textContent = t; b.classList.add('show') }
+    function updCnt() { const b = 2358, h = new Date().getHours(), m = new Date().getMinutes(); document.getElementById('cntN').textContent = (b + h * 41 + m * 5 + ~~(Math.random() * 18)).toLocaleString() }
+
+    function selCat(el, c) {
+      curCat = c;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('on'));
+      el.classList.add('on');
+      showBub(`好～为你求一签${CAT_NAMES[c]} ${CAT_ICONS[c]}`);
+    }
+
+    function clickHotspot() {
+      if (busy) return; busy = true;
+      if (navigator.vibrate) navigator.vibrate([25, 15, 25, 15, 50]);
+      ['hsRip', 'hsRip2'].forEach(id => { const r = document.getElementById(id); r.classList.remove('go'); void r.offsetWidth; r.classList.add('go') });
+      sfxKnock(); showBub(rnd(SAY.shake));
+      document.getElementById('mainBtn').innerHTML = '🔮 龙王占卜中…';
+      const shOv = document.getElementById('shakeOv'), stg = document.getElementById('qtStage');
+      shOv.classList.add('show');
+      setTimeout(() => {
+        sfxShake(2.5); stg.classList.add('shaking');
+        const r = stg.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        setTimeout(() => emitPt(cx, cy, 10, ['#ffd700', '#d4a017', '#c8860a', '#e8c97a']), 300);
+        setTimeout(() => emitPt(cx, cy, 8, ['#ffd700', '#fff', '#ffbe76']), 1200);
+      }, 500);
+      setTimeout(() => {
+        stg.classList.remove('shaking'); sfxDrop();
+        if (navigator.vibrate) navigator.vibrate(80);
+        const fs = document.getElementById('flyStk'); fs.classList.remove('go'); void fs.offsetWidth; fs.classList.add('go');
+        const r2 = stg.getBoundingClientRect(); emitPt(r2.left + r2.width / 2, r2.top + r2.height * .3, 12, ['#ffd700', '#ff6b6b', '#74b9ff']);
+      }, 3000);
+      setTimeout(() => {
+        shOv.classList.remove('show');
+        setTimeout(() => { showResult(); busy = false; document.getElementById('mainBtn').innerHTML = '🙏 摇签求卦'; updCnt() }, 400);
+      }, 4000);
+    }
+
+    /* ★ 核心改动：按当前选中类别抽签 ★ */
+    function showResult() {
+      const pool = QS[curCat] || QS['综合'];
+      curF = pool[~~(Math.random() * pool.length)];
+      const f = curF;
+
+      if (f.lv.includes('上上')) { sfxGong(); setTimeout(sfxChime, 400); emitCf(55) } else { sfxChime(); if (f.lc === 'good') emitCf(28) }
+      showBub(rnd(SAY.result));
+      emitPt(innerWidth / 2, innerHeight / 2, 18, ['#ffd700', '#ff6b6b', '#74b9ff', '#00b894', '#fdcb6e']);
+
+      // 填充弹窗
+      document.getElementById('sCat').textContent = `${CAT_ICONS[curCat]} ${CAT_NAMES[curCat]}`;
+      document.getElementById('sNo').textContent = f.n;
+
+      const lvW = document.getElementById('sLvWrap');
+      lvW.className = 's-lv ' + f.lc;
+      document.getElementById('sLv').textContent = f.lv;
+
+      const pm = document.getElementById('sPm');
+      pm.innerHTML = f.pm.map(l => `<p>${l}</p>`).join('');
+      pm.querySelectorAll('p').forEach(p => { p.style.animation = 'none'; void p.offsetWidth; p.style.animation = '' });
+
+      document.getElementById('sSeal').textContent = f.lv.includes('上上') ? '龙王赐福' : (f.lc === 'bad' ? '龙王警示' : '龙王赐签');
+      const ex = document.getElementById('sEx'); ex.textContent = f.ex; ex.style.animation = 'none'; void ex.offsetWidth; ex.style.animation = '';
+
+      // 印章动画重置
+      const seal = document.getElementById('sSeal'); seal.style.animation = 'none'; void seal.offsetWidth; seal.style.animation = '';
+
+      document.getElementById('ov').classList.add('show');
+      if (navigator.vibrate) navigator.vibrate([18, 8, 18]);
+    }
+
+    function closeR() { document.getElementById('ov').classList.remove('show'); setTimeout(() => showBub(rnd(SAY.idle)), 400) }
+    function goIndex() { window.location.href = "show.html"; }
+    function ovTap(e) { if (e.target === document.getElementById('ov')) closeR() }
+    function again() { document.getElementById('ov').classList.remove('show'); setTimeout(clickHotspot, 500) }
+    function copyF() {
+      if (!curF) return; const f = curF;
+      const t = `🐉 小龙王灵签·${f.n}\n类别：${CAT_NAMES[curCat]}\n\n【${f.lv}】\n\n${f.pm.join('\n')}\n\n📜 ${f.ex}\n\n— 小龙王灵签·诚心则灵 —`;
+      const done = () => { const b = document.getElementById('cpBtn'); b.textContent = '✅ 已复制到剪贴板'; setTimeout(() => b.textContent = '复制签文分享', 2e3) };
+      navigator.clipboard ? navigator.clipboard.writeText(t).then(done) : (() => { const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); document.execCommand('copy'); document.body.removeChild(a); done() })()
+    }
+
+    /* ============ 初始化 ============ */
+    window.addEventListener('load', () => {
+      initGold(); updCnt();
+      setTimeout(() => showBub(rnd(SAY.idle)), 800);
+      setInterval(() => { if (!busy && !document.getElementById('ov').classList.contains('show')) showBub(rnd(SAY.idle)) }, 6000);
+      setInterval(updCnt, 30000);
     });
-  });
-</script>
+    document.addEventListener('touchmove', e => { if (!e.target.closest('.slip')) e.preventDefault() }, { passive: false });
+    let lt = 0; document.addEventListener('touchend', e => { const n = Date.now(); if (n - lt < 300) e.preventDefault(); lt = n }, false);
+    document.addEventListener('keydown', e => { if (e.code === 'Space') { e.preventDefault(); clickHotspot() } });
+  </script>
+</body>
 
 </html>

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>龙宝宝生活助手</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap');
+
+    :root {
+      --page-max: 430px;
+      --glass-radius: 30px;
+      --mini-radius: 20px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      min-height: 100%;
+      height: 100%;
+    }
+
+    body {
+      font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #c8b896;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    .page {
+      position: relative;
+      max-width: var(--page-max);
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+
+    /* ========== 全屏背景 — 自适应铺满 ========== */
+    .page-bg {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: var(--page-max);
+      /* 撑满整个视口高度，包含动态工具栏 */
+      height: 100vh;
+      height: 100dvh;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .page-bg img {
+      width: 100%;
+      height: 100%;
+      /* cover 保证任何尺寸都铺满，不留白边 */
+      object-fit: cover;
+      /* 顶部对齐，角色头部不被裁切 */
+      object-position: top center;
+      /* 轻微降饱和避免与玻璃卡片叠色 */
+      filter: saturate(0.90) brightness(1.02) contrast(0.98);
+      /* 禁止图片被选中/拖拽 */
+      user-select: none;
+      -webkit-user-drag: none;
+      display: block;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      padding-bottom: 42px;
+    }
+
+    .top-spacer {
+      height: 56vw;
+      max-height: 290px;
+    }
+
+    /* ========== 天气卡片 ========== */
+    .weather-card {
+      position: relative;
+      margin: 0 16px 16px;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow:
+        0 8px 22px rgba(34, 44, 62, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    }
+
+    .weather-card .card-bg {
+      position: relative;
+    }
+
+    .weather-card .card-bg img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+    }
+
+    .weather-body {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 3;
+      padding: 12px 24px 22px;
+    }
+
+    .w-loc {
+      display: flex;
+      align-items: center;
+      margin-left: 15px;
+      transform: translateY(-6px);
+    }
+
+    .w-loc .city {
+      font-size: 15px;
+      font-weight: 700;
+      color: rgba(20, 24, 32, 0.88);
+      letter-spacing: .3px;
+    }
+
+    .w-temp {
+      font-size: 30px;
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.6px;
+      color: rgba(16, 20, 28, 0.94);
+      margin: 0 0 6px;
+      margin-left: 8px;
+      transform: translateY(-6px);
+    }
+
+    .w-detail {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(74, 84, 98, 0.82);
+      margin-left: 8px;
+      transform: translateY(-6px);
+    }
+
+    .w-detail .sep {
+      margin: 0 8px;
+      color: rgba(166, 176, 194, 0.92);
+    }
+
+    .w-detail .trend {
+      margin-left: 5px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .w-detail .trend svg {
+      width: 12px;
+      height: 12px;
+    }
+
+    /* ========== 极冷白 Liquid Glass 主卡片 ========== */
+    .g-card {
+      position: relative;
+      margin: 0 16px 16px;
+      padding: 22px 18px 24px;
+      border-radius: var(--glass-radius);
+      overflow: hidden;
+      isolation: isolate;
+
+      background:
+        linear-gradient(180deg,
+          rgba(255, 255, 255, 0.18) 0%,
+          rgba(234, 242, 255, 0.16) 40%,
+          rgba(240, 247, 255, 0.13) 100%);
+
+      -webkit-backdrop-filter:
+        blur(16px) saturate(102%) brightness(1.07) contrast(1.02);
+      backdrop-filter:
+        blur(16px) saturate(102%) brightness(1.07) contrast(1.02);
+
+      border: 1px solid rgba(255, 255, 255, 0.38);
+
+      box-shadow:
+        0 10px 22px rgba(34, 46, 66, 0.08),
+        0 2px 8px rgba(255, 255, 255, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.62),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .g-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--glass-radius);
+      pointer-events: none;
+      z-index: 0;
+      background:
+        linear-gradient(180deg,
+          rgba(210, 226, 255, 0.16) 0%,
+          rgba(220, 234, 255, 0.12) 45%,
+          rgba(235, 244, 255, 0.05) 100%);
+    }
+
+    .g-card> :not(.lg-base):not(.lg-specular):not(.lg-caustic):not(.lg-edge):not(.lg-rim) {
+      position: relative;
+      z-index: 6;
+    }
+
+    .lg-base {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--glass-radius);
+      z-index: 1;
+      pointer-events: none;
+      background:
+        radial-gradient(120% 90% at 0% 0%, rgba(255, 255, 255, 0.18) 0%, rgba(234, 242, 255, 0.10) 30%, transparent 58%),
+        radial-gradient(80% 60% at 100% 0%, rgba(220, 232, 255, 0.12) 0%, transparent 48%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(234, 242, 255, 0.04));
+      mix-blend-mode: screen;
+      opacity: .98;
+    }
+
+    .lg-specular {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      top: 8px;
+      height: 36%;
+      border-radius: 24px;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg,
+          rgba(255, 255, 255, 0.72) 0%,
+          rgba(236, 244, 255, 0.30) 20%,
+          rgba(236, 244, 255, 0.09) 46%,
+          rgba(255, 255, 255, 0) 100%);
+      opacity: .92;
+    }
+
+    .lg-caustic {
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      bottom: -10px;
+      height: 28%;
+      z-index: 3;
+      border-radius: 50%;
+      pointer-events: none;
+      background:
+        radial-gradient(56% 100% at 16% 18%, rgba(255, 255, 255, 0.18) 0%, rgba(230, 240, 255, 0.08) 34%, transparent 66%),
+        radial-gradient(42% 90% at 52% 30%, rgba(224, 236, 255, 0.12) 0%, rgba(232, 242, 255, 0.05) 36%, transparent 64%),
+        radial-gradient(32% 70% at 84% 18%, rgba(255, 255, 255, 0.10) 0%, rgba(232, 242, 255, 0.04) 36%, transparent 64%);
+      filter: blur(10px);
+      opacity: .42;
+      mix-blend-mode: screen;
+    }
+
+    .lg-edge {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--glass-radius);
+      z-index: 4;
+      pointer-events: none;
+      box-shadow:
+        inset 0 1.5px 0 rgba(255, 255, 255, 0.76),
+        inset 1px 0 0 rgba(255, 255, 255, 0.16),
+        inset -1px 0 0 rgba(255, 255, 255, 0.10),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+
+    .lg-rim {
+      position: absolute;
+      inset: 0;
+      border-radius: var(--glass-radius);
+      z-index: 5;
+      pointer-events: none;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    /* ========== 标题区 ========== */
+    .card-hd {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      padding: 0 2px;
+    }
+
+    .card-hd-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(22, 28, 36, 0.94);
+      letter-spacing: .2px;
+    }
+
+    .card-hd-title .ico {
+      width: 26px;
+      height: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-hd-title .ico svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .card-more {
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 1px;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(88, 102, 126, 0.58);
+    }
+
+    .card-more .arr {
+      font-size: 18px;
+      color: rgba(88, 102, 126, 0.42);
+    }
+
+    /* ========== 运势三列 ========== */
+    .fortune-grid {
+      display: flex;
+      gap: 3px;
+    }
+
+    .fortune-col {
+      position: relative;
+      flex: 1;
+      min-width: 0;
+      border-radius: var(--mini-radius);
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(236, 243, 255, 0.10));
+      -webkit-backdrop-filter: blur(12px) saturate(105%) brightness(1.04);
+      backdrop-filter: blur(12px) saturate(105%) brightness(1.04);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      box-shadow:
+        0 5px 12px rgba(36, 46, 66, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.48),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .fortune-col::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 6px;
+      height: 36%;
+      border-radius: 14px;
+      pointer-events: none;
+      z-index: 2;
+      background:
+        linear-gradient(180deg,
+          rgba(255, 255, 255, 0.56) 0%,
+          rgba(236, 244, 255, 0.18) 32%,
+          rgba(255, 255, 255, 0) 100%);
+    }
+
+    .fortune-col::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: var(--mini-radius);
+      pointer-events: none;
+      z-index: 3;
+      box-shadow:
+        inset 0 1.2px 0 rgba(255, 255, 255, 0.68),
+        inset 1px 0 0 rgba(255, 255, 255, 0.10),
+        inset -1px 0 0 rgba(255, 255, 255, 0.08),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .fortune-col .fc-bg-img {
+      width: 100%;
+      display: block;
+      border-radius: var(--mini-radius);
+      position: relative;
+      z-index: 1;
+      opacity: .92;
+      transform: scale(1.10);
+      transform-origin: center center;
+    }
+
+    .fortune-col .fc-content {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 4;
+      padding: 0 10px 12px;
+      height: 58%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .f-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      align-self: flex-start;
+      margin-bottom: 6px;
+      transform: translate(20px, -27px);
+      background: none !important;
+    }
+
+    .fortune-col.love .f-tag {
+      color: #d64f77;
+    }
+
+    .fortune-col.career .f-tag {
+      color: #3976bf;
+    }
+
+    .fortune-col.wealth .f-tag {
+      color: #b08425;
+    }
+
+    .f-desc {
+      font-size: 11.5px;
+      color: rgba(82, 90, 102, 0.94);
+      line-height: 1.6;
+      letter-spacing: 0.2px;
+      font-weight: 500;
+      transform: translate(0, -30px);
+    }
+
+    /* ========== 旅游推荐 ========== */
+    .dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .dots i {
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(178, 192, 220, 0.38);
+      font-style: normal;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .dots i:first-child {
+      background: rgba(132, 150, 190, 0.68);
+    }
+
+    .travel-grid {
+      display: flex;
+      gap: 10px;
+    }
+
+    .travel-col {
+      flex: 1;
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .travel-col:active {
+      transform: scale(.98);
+      transition: transform .15s;
+    }
+
+    .travel-thumb {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 1/1;
+      border-radius: 18px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      -webkit-backdrop-filter: blur(10px) saturate(105%);
+      backdrop-filter: blur(10px) saturate(105%);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      box-shadow:
+        0 5px 12px rgba(36, 46, 66, 0.06),
+        inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    }
+
+    .travel-thumb::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      top: 6px;
+      height: 28%;
+      border-radius: 12px;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(236, 244, 255, 0));
+      z-index: 2;
+    }
+
+    .travel-thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 18px;
+      pointer-events: none;
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.64),
+        inset 1px 0 0 rgba(255, 255, 255, 0.08),
+        inset -1px 0 0 rgba(255, 255, 255, 0.06);
+      z-index: 3;
+    }
+
+    .travel-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .travel-name {
+      font-size: 15px;
+      font-weight: 600;
+      color: rgba(24, 30, 38, 0.94);
+      text-align: center;
+      letter-spacing: .2px;
+    }
+
+    /* ========== 响应式 ========== */
+    @media (min-width:431px) {
+      .page {
+        box-shadow: 0 0 50px rgba(0, 0, 0, 0.08);
+      }
+    }
+
+    @media (max-width:374px) {
+      .top-spacer {
+        height: 52vw
+      }
+
+      .w-temp {
+        font-size: 26px
+      }
+
+      .g-card {
+        padding: 18px 14px 20px;
+        margin: 0 12px 12px
+      }
+
+      .weather-card {
+        margin: 0 12px 12px
+      }
+
+      .f-tag {
+        font-size: 10.5px !important;
+        padding: 3px 7px !important
+      }
+
+      .f-desc {
+        font-size: 10.5px
+      }
+
+      .travel-name {
+        font-size: 13px
+      }
+
+      .card-hd-title {
+        font-size: 18px
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page">
+
+    <div class="page-bg">
+      <img src="assets/bg-full.jpg" alt="背景">
+    </div>
+
+    <div class="content">
+      <div class="top-spacer"></div>
+
+      <!-- 天气卡片 -->
+      <div class="weather-card">
+        <div class="card-bg">
+          <img src="assets/weather-bg.png" alt="">
+        </div>
+        <div class="weather-body">
+          <div class="w-loc">
+            <span class="city">威海</span>
+          </div>
+          <div class="w-temp" id="temperature"></div>
+          <div class="w-detail">
+            <span id="windDirection"></span>
+            <span class="sep">丨</span>
+            <span id="humidity"></span>
+            <span class="trend">
+              <svg viewBox="0 0 16 16" fill="none">
+                <path d="M4 12L12 4M12 4H6M12 4V10" stroke="#96a8c6" stroke-width="1.8" stroke-linecap="round"
+                  stroke-linejoin="round" />
+              </svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 今日运势 -->
+      <div class="g-card">
+        <span class="lg-base"></span>
+        <span class="lg-specular"></span>
+        <span class="lg-caustic"></span>
+        <span class="lg-edge"></span>
+        <span class="lg-rim"></span>
+
+        <div class="card-hd">
+          <div class="card-hd-title">
+            <span class="ico">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
+                       2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
+                       C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5
+                       c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#F06292" />
+              </svg>
+            </span>
+            <span>今日运势</span>
+          </div>
+          <button class="card-more" onclick="location.href='index.html'">问龙王<span class="arr">›</span></button>
+        </div>
+
+        <div class="fortune-grid">
+          <div class="fortune-col love">
+            <img class="fc-bg-img" src="assets/fortune-love-bg.png" alt="">
+            <div class="fc-content">
+              <div class="f-tag">爱情</div>
+              <div class="f-desc">今天是个充满浪漫的日子</div>
+            </div>
+          </div>
+
+          <div class="fortune-col career">
+            <img class="fc-bg-img" src="assets/fortune-career-bg.png" alt="">
+            <div class="fc-content">
+              <div class="f-tag">事业</div>
+              <div class="f-desc">需要沉稳应对职务变化</div>
+            </div>
+          </div>
+
+          <div class="fortune-col wealth">
+            <img class="fc-bg-img" src="assets/fortune-wealth-bg.png" alt="">
+            <div class="fc-content">
+              <div class="f-tag">财运</div>
+              <div class="f-desc">今天有不错的投资机会</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 旅游推荐 — 威海本地景点 -->
+      <div class="g-card">
+        <span class="lg-base"></span>
+        <span class="lg-specular"></span>
+        <span class="lg-caustic"></span>
+        <span class="lg-edge"></span>
+        <span class="lg-rim"></span>
+
+        <div class="card-hd">
+          <div class="card-hd-title">
+            <span class="ico">
+              <svg viewBox="0 0 24 24" width="24" height="24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+                       10-4.48 10-10S17.52 2 12 2zm-1 17.93
+                       c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79
+                       L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54
+                       c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1
+                       H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41
+                       c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="#E8A44E" />
+              </svg>
+            </span>
+            <span>旅游推荐</span>
+          </div>
+          <div class="dots"><i></i><i></i><i></i></div>
+        </div>
+
+        <div class="travel-grid">
+
+          <!-- 威海·刘公岛 -->
+          <div class="travel-col">
+            <div class="travel-thumb">
+              <img src="assets/img-beijing.png" alt="刘公岛">
+            </div>
+            <div class="travel-name">威海·刘公岛</div>
+          </div>
+
+          <!-- 威海·成山头 -->
+          <div class="travel-col">
+            <div class="travel-thumb">
+              <img src="assets/img-shanghai.png" alt="成山头">
+            </div>
+            <div class="travel-name">威海·成山头</div>
+          </div>
+
+          <!-- 威海·华夏城 -->
+          <div class="travel-col">
+            <div class="travel-thumb">
+              <img src="assets/img-xian.png" alt="华夏城">
+            </div>
+            <div class="travel-name">威海·华夏城</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div style="height:30px"></div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript">
+  window._AMapSecurityConfig = {
+    securityJsCode: "a1e45b3fe32357e83c1d049d7a59bc6a",
+  };
+</script>
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=2.0&key=344345526ae85041418d2af9dd558b5f"></script>
+<script type="text/javascript">
+  //加载天气查询插件
+  AMap.plugin('AMap.Weather', function () {
+    //创建天气查询实例
+    var weather = new AMap.Weather();
+
+    //执行实时天气信息查询
+    weather.getLive('威海市', function (err, data) {
+      if (!err) {
+        document.getElementById("temperature").innerText = data.temperature + "°C";
+        document.getElementById("windDirection").innerText = data.windDirection + "风" + data.windPower + "级";
+        document.getElementById("humidity").innerText = "湿度 " + data.humidity;
+        console.log(err, data);
+      }
+    });
+  });
+</script>
+
+</html>
