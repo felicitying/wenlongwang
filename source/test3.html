@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+  />
+  <title>小龙王灵签</title>
+  <style>
+    :root {
+      --gold: #f7d27a;
+      --gold-deep: #d99b2b;
+      --red: #b93b2d;
+      --ink: #3b2b21;
+      --paper: rgba(255, 248, 236, 0.94);
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: #f4e2c5;
+      color: #fff;
+    }
+
+    body {
+      position: relative;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    .app {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background:
+        linear-gradient(to bottom, rgba(255, 220, 160, 0.08), rgba(0, 0, 0, 0.18)),
+        url('bg.jpg') center center / cover no-repeat;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 75% 28%, rgba(255, 255, 210, 0.34), transparent 18%),
+        linear-gradient(to top, rgba(255, 180, 120, 0.15), transparent 35%);
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: absolute;
+      top: calc(10px + var(--safe-top));
+      left: 0;
+      right: 0;
+      z-index: 8;
+      text-align: center;
+      padding: 0 18px;
+    }
+
+    .title {
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff5d8;
+      text-shadow:
+        0 2px 10px rgba(0,0,0,0.35),
+        0 0 18px rgba(255, 210, 122, 0.3);
+    }
+
+    .subtitle {
+      margin-top: 6px;
+      font-size: 13px;
+      color: rgba(255,255,255,0.92);
+      text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+    }
+
+    .dragon-zone {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    /* 小龙王整体轻微浮动 */
+    .dragon-float {
+      position: absolute;
+      left: 50%;
+      top: 53%;
+      width: 74vw;
+      height: 58vh;
+      transform: translate(-50%, -50%);
+      animation: floaty 3.8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes floaty {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0px); }
+      50% { transform: translate(-50%, -50%) translateY(-8px); }
+    }
+
+    /* 签筒可点击热区：根据图片大致定位 */
+    .cup-hotspot {
+      position: absolute;
+      left: 52.5%;
+      top: 69%;
+      width: 18vw;
+      height: 18vw;
+      min-width: 82px;
+      min-height: 82px;
+      max-width: 120px;
+      max-height: 120px;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      border-radius: 50%;
+      cursor: pointer;
+      background: radial-gradient(circle, rgba(255, 218, 119, 0.08), rgba(255, 255, 255, 0));
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.04) inset,
+        0 0 28px rgba(255, 208, 98, 0.18);
+      pointer-events: auto;
+    }
+
+    .cup-hotspot::before {
+      content: "轻点摇签";
+      position: absolute;
+      left: 50%;
+      top: -32px;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: #fff8e7;
+      padding: 4px 10px;
+      white-space: nowrap;
+      border-radius: 999px;
+      background: rgba(84, 45, 18, 0.42);
+      backdrop-filter: blur(4px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.18);
+      animation: blinkTip 2s ease-in-out infinite;
+    }
+
+    @keyframes blinkTip {
+      0%,100% { opacity: 0.75; transform: translateX(-50%) translateY(0); }
+      50% { opacity: 1; transform: translateX(-50%) translateY(-3px); }
+    }
+
+    .pulse-ring, .pulse-ring2 {
+      position: absolute;
+      inset: -8px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255, 217, 130, 0.42);
+      animation: pulse 2.4s infinite;
+      pointer-events: none;
+    }
+
+    .pulse-ring2 {
+      animation-delay: 1.2s;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.86);
+        opacity: 0.0;
+      }
+      20% {
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(1.35);
+        opacity: 0;
+      }
+    }
+
+    /* 模拟签筒局部摇动覆盖层 */
+    .cup-shake-overlay {
+      position: absolute;
+      left: 52.5%;
+      top: 69%;
+      width: 21vw;
+      height: 23vw;
+      min-width: 92px;
+      min-height: 100px;
+      max-width: 136px;
+      max-height: 148px;
+      transform: translate(-50%, -50%);
+      transform-origin: 50% 78%;
+      z-index: 7;
+      pointer-events: none;
+      opacity: 0;
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,0.18));
+    }
+
+    .cup-shake-overlay.active {
+      opacity: 1;
+      animation: cupShake 1.25s cubic-bezier(.36,.07,.19,.97);
+    }
+
+    @keyframes cupShake {
+      0%   { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+      10%  { transform: translate(-50%, -50%) rotate(-12deg) scale(1.02); }
+      20%  { transform: translate(-50%, -50%) rotate(12deg) scale(1.02); }
+      30%  { transform: translate(-50%, -50%) rotate(-16deg) scale(1.03); }
+      40%  { transform: translate(-50%, -50%) rotate(15deg) scale(1.03); }
+      50%  { transform: translate(-50%, -50%) rotate(-10deg) scale(1.02); }
+      60%  { transform: translate(-50%, -50%) rotate(9deg) scale(1.02); }
+      70%  { transform: translate(-50%, -50%) rotate(-6deg) scale(1.01); }
+      80%  { transform: translate(-50%, -50%) rotate(5deg) scale(1.01); }
+      100% { transform: translate(-50%, -50%) rotate(0deg) scale(1); }
+    }
+
+    /* 伪签筒造型，仅用于动画视觉增强 */
+    .cup-body {
+      position: absolute;
+      left: 50%;
+      top: 54%;
+      width: 70%;
+      height: 70%;
+      transform: translate(-50%, -50%);
+      background:
+        linear-gradient(180deg, #6f4328, #4a2918 55%, #2b170d);
+      border-radius: 26% 26% 34% 34% / 18% 18% 30% 30%;
+      box-shadow:
+        inset 0 2px 0 rgba(255,255,255,0.15),
+        inset 0 -8px 16px rgba(0,0,0,0.28),
+        0 8px 16px rgba(0,0,0,0.24);
+      border: 2px solid rgba(231, 180, 94, 0.5);
+    }
+
+    .cup-rim {
+      position: absolute;
+      left: 50%;
+      top: 22%;
+      width: 84%;
+      height: 16%;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: linear-gradient(180deg, #caa15e, #8f642e);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.35);
+    }
+
+    .cup-mark {
+      position: absolute;
+      left: 50%;
+      top: 56%;
+      transform: translate(-50%, -50%);
+      color: #f1c66f;
+      font-size: 22px;
+      font-weight: 700;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .stick {
+      position: absolute;
+      bottom: 47%;
+      width: 8%;
+      height: 42%;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #8a5b3f, #5a3827);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+      transform-origin: bottom center;
+    }
+
+    .stick::after {
+      content: "";
+      position: absolute;
+      top: -6%;
+      left: 50%;
+      width: 120%;
+      height: 11%;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #5f3a29;
+    }
+
+    .s1 { left: 20%; transform: rotate(-14deg); height: 46%; }
+    .s2 { left: 34%; transform: rotate(-7deg); }
+    .s3 { left: 48%; transform: rotate(2deg); height: 44%; }
+    .s4 { left: 61%; transform: rotate(10deg); }
+    .s5 { left: 74%; transform: rotate(17deg); height: 45%; }
+
+    .cup-shake-overlay.active .stick {
+      animation: stickJitter 0.18s linear 6;
+    }
+
+    @keyframes stickJitter {
+      0% { margin-bottom: 0; }
+      25% { margin-bottom: 2px; }
+      50% { margin-bottom: -2px; }
+      75% { margin-bottom: 1px; }
+      100% { margin-bottom: 0; }
+    }
+
+    /* 飞出签 */
+    .flying-stick {
+      position: absolute;
+      left: 54%;
+      top: 67%;
+      width: 12px;
+      height: 100px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #a86a47, #6f4328);
+      z-index: 9;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.18);
+      transform-origin: bottom center;
+    }
+
+    .flying-stick::after {
+      content: "";
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      width: 15px;
+      height: 10px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: #6a3f2b;
+    }
+
+    .flying-stick.active {
+      animation: flyStick 1s ease-out forwards;
+    }
+
+    @keyframes flyStick {
+      0% {
+        opacity: 0;
+        transform: translate(0, 0) rotate(0deg) scale(0.9);
+      }
+      8% {
+        opacity: 1;
+      }
+      35% {
+        opacity: 1;
+        transform: translate(-18px, -120px) rotate(-16deg) scale(1.04);
+      }
+      65% {
+        opacity: 1;
+        transform: translate(14px, -215px) rotate(9deg) scale(1.02);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-4px, -280px) rotate(-4deg) scale(0.96);
+      }
+    }
+
+    /* 金光 */
+    .burst {
+      position: absolute;
+      left: 52.5%;
+      top: 69%;
+      width: 18vw;
+      height: 18vw;
+      min-width: 84px;
+      min-height: 84px;
+      transform: translate(-50%, -50%);
+      z-index: 6;
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      background:
+        radial-gradient(circle, rgba(255, 241, 188, 0.86) 0%, rgba(255, 211, 110, 0.35) 32%, rgba(255,255,255,0) 72%);
+      filter: blur(4px);
+    }
+
+    .burst.active {
+      animation: burstAnim 0.9s ease-out;
+    }
+
+    @keyframes burstAnim {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+      20% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.8); }
+    }
+
+    /* 粒子层 */
+    .particles {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #fff6d5 10%, #ffd777 55%, rgba(255,255,255,0) 70%);
+      opacity: 0;
+      filter: blur(0.4px);
+    }
+
+    .bottom-actions {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: calc(18px + var(--safe-bottom));
+      z-index: 8;
+      display: flex;
+      justify-content: center;
+      pointer-events: none;
+    }
+
+    .hint-box {
+      pointer-events: auto;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(64, 33, 13, 0.36);
+      backdrop-filter: blur(8px);
+      color: #fff7e8;
+      font-size: 13px;
+      box-shadow: 0 8px 22px rgba(0,0,0,0.18);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .hint-box strong {
+      color: #ffd98a;
+    }
+
+    /* 结果弹窗 */
+    .result-mask {
+      position: absolute;
+      inset: 0;
+      z-index: 30;
+      background: rgba(18, 10, 6, 0.48);
+      backdrop-filter: blur(6px);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: 0.28s ease;
+      padding: 16px 14px calc(12px + var(--safe-bottom));
+    }
+
+    .result-mask.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .result-card {
+      width: 100%;
+      max-width: 520px;
+      max-height: 82vh;
+      overflow: auto;
+      border-radius: 28px 28px 18px 18px;
+      background:
+        linear-gradient(180deg, rgba(190, 42, 34, 0.96), rgba(124, 25, 21, 0.98) 16%, rgba(255,248,236,0.98) 16.5%);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.28);
+      transform: translateY(32px) scale(0.98);
+      transition: 0.32s cubic-bezier(.2,.8,.2,1);
+      color: var(--ink);
+      position: relative;
+    }
+
+    .result-mask.show .result-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .card-head {
+      height: 86px;
+      color: #fff9ea;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .card-head .head-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .card-head .head-sub {
+      margin-top: 4px;
+      font-size: 12px;
+      opacity: 0.92;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    .card-body {
+      padding: 18px 18px 20px;
+    }
+
+    .fortune-level {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ffefc1, #f5cf76);
+      color: #7d4514;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+      margin-bottom: 12px;
+    }
+
+    .fortune-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #7c2e24;
+      margin-bottom: 8px;
+    }
+
+    .fortune-no {
+      color: #9e7c55;
+      font-size: 13px;
+      margin-bottom: 16px;
+    }
+
+    .section {
+      margin-bottom: 14px;
+      background: #fffaf1;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid rgba(201, 157, 79, 0.18);
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #aa6d2e;
+      margin-bottom: 8px;
+    }
+
+    .section p {
+      margin: 0;
+      line-height: 1.72;
+      font-size: 15px;
+      color: #4b3527;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .mini-item {
+      background: #fff7e9;
+      border-radius: 14px;
+      padding: 12px;
+      border: 1px solid rgba(207, 173, 114, 0.18);
+    }
+
+    .mini-item h4 {
+      margin: 0 0 6px;
+      font-size: 13px;
+      color: #9d642b;
+    }
+
+    .mini-item div {
+      font-size: 14px;
+      color: #4e392c;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #d94c3d, #b23528);
+      color: #fffaf2;
+      box-shadow: 0 10px 20px rgba(185, 59, 45, 0.24);
+    }
+
+    .btn-secondary {
+      background: #f5ead7;
+      color: #7b4f2c;
+      border: 1px solid rgba(196, 158, 93, 0.3);
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      top: calc(88px + var(--safe-top));
+      transform: translateX(-50%);
+      z-index: 20;
+      background: rgba(53, 29, 14, 0.68);
+      color: #fff7e6;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      opacity: 0;
+      pointer-events: none;
+      transition: .25s ease;
+      backdrop-filter: blur(6px);
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    .loading-chant {
+      position: absolute;
+      left: 50%;
+      top: 61%;
+      transform: translate(-50%, -50%);
+      z-index: 12;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(84, 45, 18, 0.46);
+      color: #fff5e1;
+      font-size: 14px;
+      letter-spacing: 1px;
+      opacity: 0;
+      transition: 0.25s ease;
+      backdrop-filter: blur(6px);
+    }
+
+    .loading-chant.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <div class="topbar">
+      <div class="title">小龙王灵签</div>
+      <div class="subtitle">轻点签筒，诚心一念，静候灵签揭晓</div>
+    </div>
+
+    <div class="dragon-zone">
+      <div class="dragon-float"></div>
+
+      <div class="burst" id="burst"></div>
+
+      <div class="cup-shake-overlay" id="cupOverlay">
+        <div class="cup-body"></div>
+        <div class="cup-rim"></div>
+        <div class="cup-mark">福</div>
+        <div class="stick s1"></div>
+        <div class="stick s2"></div>
+        <div class="stick s3"></div>
+        <div class="stick s4"></div>
+        <div class="stick s5"></div>
+      </div>
+
+      <div class="flying-stick" id="flyingStick"></div>
+
+      <div class="particles" id="particles"></div>
+
+      <div class="cup-hotspot" id="drawBtn" aria-label="摇签">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring2"></div>
+      </div>
+    </div>
+
+    <div class="loading-chant" id="loadingChant">灵气汇聚中…</div>
+
+    <div class="bottom-actions">
+      <div class="hint-box">点击<strong>签筒</strong>开始摇签</div>
+    </div>
+
+    <div class="toast" id="toast">请稍候，灵签正在显现…</div>
+
+    <div class="result-mask" id="resultMask">
+      <div class="result-card">
+        <div class="card-head">
+          <div class="head-title">小龙王灵签</div>
+          <div class="head-sub">心诚则灵，得签自省</div>
+          <button class="close-btn" id="closeBtn">✕</button>
+        </div>
+
+        <div class="card-body">
+          <div class="fortune-level" id="fortuneLevel">上签</div>
+          <div class="fortune-title" id="fortuneTitle">签文标题</div>
+          <div class="fortune-no" id="fortuneNo">第 1 签</div>
+
+          <div class="section">
+            <div class="section-title">签文</div>
+            <p id="fortunePoem"></p>
+          </div>
+
+          <div class="section">
+            <div class="section-title">解签</div>
+            <p id="fortuneExplain"></p>
+          </div>
+
+          <div class="grid">
+            <div class="mini-item">
+              <h4>宜</h4>
+              <div id="fortuneDo"></div>
+            </div>
+            <div class="mini-item">
+              <h4>忌</h4>
+              <div id="fortuneDont"></div>
+            </div>
+            <div class="mini-item">
+              <h4>事业</h4>
+              <div id="fortuneCareer"></div>
+            </div>
+            <div class="mini-item">
+              <h4>感情</h4>
+              <div id="fortuneLove"></div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-secondary" id="closeBtn2">收起灵签</button>
+            <button class="btn btn-primary" id="againBtn">再摇一次</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fortunes = [
+      {
+        no: 1, level: "上上签", title: "日出东海",
+        poem: "晓日初升照海门，云开雾散见乾坤。",
+        explain: "大势渐明，困局将解。若你最近正处于观望阶段，此签主先难后易、拨云见日。宜坚定推进，不必过分犹豫。",
+        yi: "启程、谈合作、做决定",
+        ji: "反复拖延、妄自菲薄",
+        career: "机会渐近，适合主动争取。",
+        love: "坦诚表达可见回应。"
+      },
+      {
+        no: 2, level: "上签", title: "清风入怀",
+        poem: "清风徐来烦虑散，一念安然万事开。",
+        explain: "心境稳定，运势自然平顺。此签多主情绪转晴，事情按部就班即可得成，不宜急于求快。",
+        yi: "整理计划、修复关系、养神",
+        ji: "冲动求成、口舌争执",
+        career: "稳中有进，适合完善细节。",
+        love: "温柔沟通胜过强求。"
+      },
+      {
+        no: 3, level: "中上签", title: "月映潮生",
+        poem: "潮来潮去有时序，月满月亏总复圆。",
+        explain: "运势起伏属常态，眼前的小波折并非坏事。只要守住节奏，待时机成熟，自会回稳转好。",
+        yi: "等待时机、复盘、学习",
+        ji: "因一时得失乱阵脚",
+        career: "项目会有反复，后劲尚足。",
+        love: "先稳情绪，再谈未来。"
+      },
+      {
+        no: 4, level: "上签", title: "金鳞得水",
+        poem: "金鳞一跃逢沧海，自有风云送远程。",
+        explain: "贵在环境得宜。你若处于对的平台、对的人群、对的方向，潜能将迅速放大。此签主顺势而行。",
+        yi: "换赛道、展示实力、面试",
+        ji: "固守旧局、畏首畏尾",
+        career: "平台加持明显，适合冲刺。",
+        love: "在人群中更易遇良缘。"
+      },
+      {
+        no: 5, level: "中签", title: "小舟过湾",
+        poem: "湾深浪缓舟宜稳，莫向急流争一先。",
+        explain: "目前不宜激进。此签主“稳比快重要”，尤其在财务、合作、情感承诺上，应多观察一步。",
+        yi: "保守推进、核对信息",
+        ji: "冒进投资、仓促表态",
+        career: "细水长流，适合稳扎稳打。",
+        love: "不妨先相处，再定关系。"
+      },
+      {
+        no: 6, level: "上上签", title: "福星临门",
+        poem: "门前喜气映朱栏，好事将成在眼前。",
+        explain: "近期有明显好消���之象。签意偏向结果落地，尤其适合求成、求名、求消息者，往往比预期更顺。",
+        yi: "求职、签约、见长辈",
+        ji: "临门退缩、自我怀疑",
+        career: "容易拿到答复或肯定。",
+        love: "适合推进见面与确认。"
+      },
+      {
+        no: 7, level: "中签", title: "浮云遮月",
+        poem: "月本常明云偶掩，守心片刻自重辉。",
+        explain: "短暂受阻，不必悲观。很多困扰来自外部杂音，不是本质问题。调整状态后，事情仍有转机。",
+        yi: "沉淀自己、减少分心",
+        ji: "受他人影响过大",
+        career: "有干扰但不伤根本。",
+        love: "别用猜测代替沟通。"
+      },
+      {
+        no: 8, level: "下签", title: "逆水回风",
+        poem: "逆水行舟风又急，此时轻动易生波。",
+        explain: "此签提醒谨慎。当前局面阻力偏大，若强行推进，容易事倍功半。宜缓行、避冲、修整。",
+        yi: "止损、休整、求助",
+        ji: "硬碰硬、赌气行事",
+        career: "暂避锋芒，别正面冲撞。",
+        love: "冷静比追问更重要。"
+      },
+      {
+        no: 9, level: "中上签", title: "柳暗花明",
+        poem: "前路转弯疑无道，忽见花明别样春。",
+        explain: "事情会在看似僵持时迎来出口。此签主转机，尤其利于卡壳已久、久无回音之事。",
+        yi: "继续尝试、重新联络",
+        ji: "半途放弃",
+        career: "方案调整后有突破。",
+        love: "旧误会有机会化解。"
+      },
+      {
+        no: 10, level: "上签", title: "青云可望",
+        poem: "胸藏志气人未识，时到青云自有名。",
+        explain: "你并非没有实力，只是火候未到。此签主积累见效，适合继续精进，等待被看见。",
+        yi: "充实履历、练表达、投稿",
+        ji: "妄自轻弃、急于证明",
+        career: "正处于蓄势上升期。",
+        love: "先让自己发光。"
+      },
+      {
+        no: 11, level: "中签", title: "静水观心",
+        poem: "水静方能照人影，心宁始可见真章。",
+        explain: "此签偏内修。若问题久拖不决，答案多半不在外界，而在你是否看清自身需求。",
+        yi: "独处、写下想法、减法生活",
+        ji: "跟风决定",
+        career: "适合重新梳理方向。",
+        love: "先明确你真正想要什么。"
+      },
+      {
+        no: 12, level: "上签", title: "天光映海",
+        poem: "海阔天长容万象，胸怀一展路千重。",
+        explain: "格局一开，事情就顺。此签利开拓、远行、跨界、接触新机会。不要把自己困在旧经验里。",
+        yi: "旅行、拓客、跨部门合作",
+        ji: "自限边界",
+        career: "越主动拓展，越有收获。",
+        love: "新场景更易遇见心动。"
+      },
+      {
+        no: 13, level: "中下签", title: "砂中觅珠",
+        poem: "珠藏细砂须耐性，乱翻急找反迷踪。",
+        explain: "眼下收效较慢，急躁会让你错过真正有价值的东西。此签主耐心筛选，不宜贪多求快。",
+        yi: "筛选、复查、慢决策",
+        ji: "草率承诺、频繁变动",
+        career: "要从杂事中抓关键。",
+        love: "别被表象迷惑。"
+      },
+      {
+        no: 14, level: "上上签", title: "龙门得跃",
+        poem: "一跃龙门惊四座，从今声名动八方。",
+        explain: "大吉之象。若你正在等待成绩、竞选、考试、晋升、发布结果，此签非常有力，主突破与被认可。",
+        yi: "冲刺、公开展示、提交成果",
+        ji: "临阵松懈",
+        career: "有明显上升与肯定。",
+        love: "优秀的你更具吸引力。"
+      },
+      {
+        no: 15, level: "中签", title: "半晴半雨",
+        poem: "天边云色时明暗，事到中途看定心。",
+        explain: "事情尚未完全明朗，过程中会有变化。关键在于你是否稳得住，不因一点风吹草动而乱改方向。",
+        yi: "留后手、观察、稳推进",
+        ji: "朝令夕改",
+        career: "适合边做边调。",
+        love: "别急着下结论。"
+      },
+      {
+        no: 16, level: "上签", title: "梅开二度",
+        poem: "旧枝忽放新花色，再试前程胜往时。",
+        explain: "适合“再来一次”。曾经失利或停滞的事情，换个方式重新尝试，会比第一次更有结果。",
+        yi: "二次申请、复联、重启计划",
+        ji: "因旧败而退缩",
+        career: "老项目有翻盘空间。",
+        love: "旧关系也许值得重谈。"
+      },
+      {
+        no: 17, level: "下签", title: "风急浪高",
+        poem: "风高浪急船难定，暂泊沙洲避一时。",
+        explain: "当前环境并不稳定，强上未必有利。此签劝你先保全自身，再图后续，不要为面子逞强。",
+        yi: "缓冲、调整、避争",
+        ji: "强撑、赌运气",
+        career: "先稳住比扩张重要。",
+        love: "别在情绪高点做决定。"
+      },
+      {
+        no: 18, level: "中上签", title: "桃李有信",
+        poem: "春风不语花自放，好意终将得回音。",
+        explain: "你曾付出的善意、努力、耐心，正在酝酿回响。短期看似普通，后面会逐步显现价值。",
+        yi: "持续投入、保持礼数",
+        ji: "急于索取回报",
+        career: "长期经营有成果。",
+        love: "真诚会被看见。"
+      },
+      {
+        no: 19, level: "上签", title: "星照归途",
+        poem: "夜深忽见星光引，迷路之人亦可归。",
+        explain: "若你最近迷茫、纠结、没有方向，此签主指引出现。可能是一个人、一句话、一次机会点醒你。",
+        yi: "听建议、见高人、接触新信息",
+        ji: "封闭自己",
+        career: "贵人指路运较强。",
+        love: "适合认真谈一次心。"
+      },
+      {
+        no: 20, level: "中签", title: "石上种花",
+        poem: "石上种花非不美，须知根浅耐心培。",
+        explain: "事情可以做，但基础稍弱，需要更多照料。短期难见爆发，适合打地基、夯实根本。",
+        yi: "补基础、练功、慢养成",
+        ji: "急着验收成果",
+        career: "成长可期，但不能速成。",
+        love: "关系需要经营，不靠激情。"
+      },
+      {
+        no: 21, level: "上上签", title: "祥云覆顶",
+        poem: "祥云缭绕临门第，万事逢时可称心。",
+        explain: "吉气旺盛，整体运势佳。求财、求事、求感情皆有顺意之象，尤其利于主动出击。",
+        yi: "拜访、洽谈、告白、开单",
+        ji: "错失窗口期",
+        career: "综合运高，收获较多。",
+        love: "感情推进顺畅。"
+      },
+      {
+        no: 22, level: "中下签", title: "镜花水月",
+        poem: "水月镜花虽可见，近前方觉本难留。",
+        explain: "此签提醒分辨真假。眼前某些机会、承诺、情绪，也许很好看，但未必能落地，务必核实。",
+        yi: "求证、观望、保留判断",
+        ji: "被表面打动",
+        career: "注意空头承诺。",
+        love: "别被一时热情迷住。"
+      },
+      {
+        no: 23, level: "中上签", title: "松风入谷",
+        poem: "松风入谷声虽远，静听自知意自长。",
+        explain: "事情正在酝酿，不必焦虑。你需要给信息一点时间发酵，很多好消息并不会第一时间到来。",
+        yi: "等待回复、保持耐心",
+        ji: "频繁催促、过度解读",
+        career: "后续消息偏利好。",
+        love: "慢热关系反而稳定。"
+      },
+      {
+        no: 24, level: "上签", title: "宝船载福",
+        poem: "宝船满载归来日，所愿所求可渐圆。",
+        explain: "财运与结果运较佳。此签利收回款项、拿到回报、看到成果，但前提是你此前已有耕耘。",
+        yi: "收尾、结算、推进成交",
+        ji: "临近收获反松散",
+        career: "项目回报可期。",
+        love: "适合把关系落到现实。"
+      },
+      {
+        no: 25, level: "中签", title: "阶前细雨",
+        poem: "细雨无声润新芽，慢功亦能长青枝。",
+        explain: "看似进展慢，其实在积蓄真实成长。此签偏向“润物细无声”，适合长期主义。",
+        yi: "坚持、养成、持续输出",
+        ji: "三天打鱼两天晒网",
+        career: "稳步累积很关键。",
+        love: "温柔陪伴胜过轰烈。"
+      },
+      {
+        no: 26, level: "下签", title: "枯木逢霜",
+        poem: "枝头本弱偏逢霜，眼下宜藏不宜张。",
+        explain: "此时对外扩张、贸然表态都不算好时机。更适合保护自己，减少消耗，等环境转暖再动。",
+        yi: "节制、减少支出、早休息",
+        ji: "冒险、硬撑、与人较劲",
+        career: "注意内耗与资源不足。",
+        love: "先处理好自己状态。"
+      },
+      {
+        no: 27, level: "上签", title: "鹤鸣九皋",
+        poem: "高处一声鹤唳起，远近闻者尽知音。",
+        explain: "你的表达、作品、能力，会被更多人看见。尤其适合发声、发布、演讲、展示成果。",
+        yi: "发作品、演示、报名、竞标",
+        ji: "把光芒藏起来",
+        career: "曝光提升，利于出圈。",
+        love: "真诚表达会增进理解。"
+      },
+      {
+        no: 28, level: "中上签", title: "桥成可渡",
+        poem: "前滩无路愁难过，忽有长桥接两边。",
+        explain: "本来看似难以连接的事情，会因为某个桥梁人物或关键条件而得以推进。此签利中间人、资源整合。",
+        yi: "找介绍、谈协作、借力",
+        ji: "单打独斗",
+        career: "合作比独撑更有效。",
+        love: "借一次坦白打通心桥。"
+      },
+      {
+        no: 29, level: "中签", title: "灯下寻书",
+        poem: "欲得真章须细看，灯前耐坐胜浮忙。",
+        explain: "答案就在细节里。此签提醒你少些空想，多些查证与落地，认真做功课会减少很多弯路。",
+        yi: "学习、查资料、做准备",
+        ji: "凭感觉草率决定",
+        career: "专业度决定结果。",
+        love: "了解彼此比幻想重要。"
+      },
+      {
+        no: 30, level: "上上签", title: "玉阶传喜",
+        poem: "玉阶忽报佳音至，久候之门今始开。",
+        explain: "等待中的事情有强烈“终于来了”的意味。若你已等了许久，此签大多主好消息、转正、确认、录取、通过。",
+        yi: "查看消息、确认流程、抓住时机",
+        ji: "因不安而错过通知",
+        career: "极可能迎来关键进展。",
+        love: "关系更有机会定下来。"
+      },
+      {
+        no: 31, level: "中下签", title: "沙漏迟回",
+        poem: "欲催细沙偏更慢，强求反使意难成。",
+        explain: "有些事暂时催不来。你越焦虑、越逼迫，越容易把原本可成之事弄乱。应以柔克急。",
+        yi: "放缓、松手一点、顺势",
+        ji: "逼问、过催、过度控制",
+        career: "催进度不如改善配合。",
+        love: "给彼此一点空间。"
+      },
+      {
+        no: 32, level: "上签", title: "花开见喜",
+        poem: "枝头新蕊逢春放，一处生机万处明。",
+        explain: "新的机会正在出现，且会带动整体状态变好。此签利开局、更新、焕新、搬迁、换工作等。",
+        yi: "启动新计划、整理空间",
+        ji: "沉溺旧耗损",
+        career: "新开端带来新气象。",
+        love: "新关系、新阶段皆可期。"
+      },
+      {
+        no: 33, level: "中签", title: "山路盘旋",
+        poem: "山路虽弯终向上，不因一折便停行。",
+        explain: "过程会绕，但方向未错。不要因为中间多花了时间，就否定自己走的路，耐心就是通行证。",
+        yi: "持续、修正、别放弃",
+        ji: "因曲折而全盘推翻",
+        career: "项目复杂但终有结果。",
+        love: "磨合并不等于不合适。"
+      },
+      {
+        no: 34, level: "上签", title: "明珠出匣",
+        poem: "匣中明珠今始现，不负尘封岁月深。",
+        explain: "过去积累的能力、作品、口碑，终于有机会展现价值。此签主“被发现”，也主“证明自己”。",
+        yi: "展示履历、谈加薪、投递重要机会",
+        ji: "继续低估自己",
+        career: "过去积累开始兑现。",
+        love: "你值得被认真珍惜。"
+      },
+      {
+        no: 35, level: "下签", title: "雾锁江天",
+        poem: "四野茫茫分不路，夜航切莫任心前。",
+        explain: "信息不足时不宜做大决定。此签最忌凭感觉孤注一掷，先把真相看清，再定去留。",
+        yi: "暂停重大决定、收集信息",
+        ji: "盲投、盲信、盲冲",
+        career: "别在模糊阶段拍板。",
+        love: "关系边界要先弄清。"
+      },
+      {
+        no: 36, level: "中上签", title: "春水初生",
+        poem: "春水初生波未盛，轻舟已可向前行。",
+        explain: "时机虽未完全成熟，但已经可以温和启动。此签不主猛冲，而主先走一步，占住先机。",
+        yi: "小范围试水、先行动",
+        ji: "等到万事俱备才开始",
+        career: "先发优势正在形成。",
+        love: "可以先迈出友好一步。"
+      },
+      {
+        no: 37, level: "上上签", title: "瑞光满庭",
+        poem: "瑞光入户开千福，人事天时两相宜。",
+        explain: "此为综合大吉签。主天时、人和、心气俱佳，很多原本困难的事情会比想象中更顺。",
+        yi: "求成、求婚、求职、求合作",
+        ji: "犹豫不决、错过良机",
+        career: "非常利结果落地。",
+        love: "适合确认关系与承诺。"
+      },
+      {
+        no: 38, level: "中签", title: "竹影微摇",
+        poem: "风来竹影斜还正，得失无须问太频。",
+        explain: "外界变化会影响你心态，但真正重要的是保持内在稳定。此签主放平衡，不必对每个波动过度反应。",
+        yi: "稳心、做长期计划",
+        ji: "频繁自我否定",
+        career: "情绪稳定后效率更高。",
+        love: "少试探，多真实。"
+      },
+      {
+        no: 39, level: "上签", title: "云帆正举",
+        poem: "长风借力云帆起，万里前程自此开。",
+        explain: "助力已到，眼下适合把握势能往前走。此签偏利远方、拓展、出海、跨区域发展。",
+        yi: "拓展、出行、谈更大机会",
+        ji: "自我设限",
+        career: "有做大的可能。",
+        love: "异地缘分亦可发展。"
+      },
+      {
+        no: 40, level: "中下签", title: "夜雨敲窗",
+        poem: "夜雨无眠心易乱，天明之后再观行。",
+        explain: "情绪容易干扰判断。你现在感受到的压力是真实的，但并不代表事情全无希望，先休息再决定。",
+        yi: "睡好、冷静、延后决策",
+        ji: "深夜做重大决定",
+        career: "需要先恢复状态。",
+        love: "别在委屈时说绝话。"
+      },
+      {
+        no: 41, level: "上签", title: "兰舟顺水",
+        poem: "顺水行舟多省力，得人扶处路更宽。",
+        explain: "此签利借力与合作。若你愿意放下“必须独自完成”的执念，事情会轻松很多。",
+        yi: "组队、求助、资源互换",
+        ji: "凡事闷头独扛",
+        career: "协作效率远高于单打独斗。",
+        love: "互相体谅，关系更顺。"
+      },
+      {
+        no: 42, level: "中签", title: "露重花迟",
+        poem: "花期未到休先折，静守枝头待露干。",
+        explain: "不是没有结果，而是还不到摘取之时。此签利等待成熟，忌提前收网。",
+        yi: "耐心观察、保留余地",
+        ji: "太早定论、过快收手",
+        career: "仍需一点时间发酵。",
+        love: "时机比热情更重要。"
+      },
+      {
+        no: 43, level: "上上签", title: "锦书将至",
+        poem: "远信今朝传喜字，悬心之事总能安。",
+        explain: "主消息运强。等待中的通知、回音、结果，大多偏向有利，且能让你放下悬着的心。",
+        yi: "留意通知、保持畅通",
+        ji: "错过联络",
+        career: "回复、录用、合作反馈偏佳。",
+        love: "想见的人可能会主动联系。"
+      },
+      {
+        no: 44, level: "中下签", title: "舟系浅滩",
+        poem: "舟系浅滩难远去，且修舟楫待潮生。",
+        explain: "问题不在愿望，而在条件尚不足。眼下更适合补资源、修能力、养精力，而非强行远航。",
+        yi: "准备、学习、攒资源",
+        ji: "在短板未补时硬上",
+        career: "先补关键能力更重要。",
+        love: "先成为更稳定的人。"
+      },
+      {
+        no: 45, level: "上签", title: "凤鸣高枝",
+        poem: "高枝忽闻清音起，自有良机落眼前。",
+        explain: "你将因为某个亮点被注意到。此签利形象、表现、发布、见面、舞台感相关事项。",
+        yi: "打磨形象、争取曝光、提案",
+        ji: "缩在角落不出声",
+        career: "个人品牌与表现力加分。",
+        love: "见面比聊天更容易心动。"
+      },
+      {
+        no: 46, level: "中签", title: "棋至中盘",
+        poem: "中盘局势未分晓，且看一着定高低。",
+        explain: "现在还不是下最终判断的时候。很多变量尚在变化，一步关键动作会扭转结果。",
+        yi: "保留筹码、看准时机",
+        ji: "过早认输或过早庆祝",
+        career: "关键节点将近。",
+        love: "一句真话可能改变局面。"
+      },
+      {
+        no: 47, level: "上签", title: "喜鹊登枝",
+        poem: "喜鹊登枝传好意，门庭近日有佳音。",
+        explain: "近期偏利人际与消息，适合主动联系、探访、建立关系。你所期待的回音正在路上。",
+        yi: "约见、拜访、发出邀请",
+        ji: "闷等不动",
+        career: "人脉带来新机会。",
+        love: "主动一点会更有进展。"
+      },
+      {
+        no: 48, level: "中下签", title: "寒潮未退",
+        poem: "寒意犹存花未放，莫因一时失长春。",
+        explain: "现在不是完全展开的阶段。别因为短期冷淡就误判未来，先缩短战线，保护热情。",
+        yi: "精简任务、养精神",
+        ji: "全面铺开、透支自己",
+        career: "收缩战线后更稳。",
+        love: "别把暂时冷淡当作终局。"
+      },
+      {
+        no: 49, level: "上上签", title: "海天同庆",
+        poem: "海阔天空同一色，福来心应万缘开。",
+        explain: "终章大吉。此签象征圆融、开运、得愿。近期适合许愿、开启新阶段，也适合把重要的事往前推一步。",
+        yi: "许愿、告白、启动新篇、庆祝",
+        ji: "畏缩不前、错失好运",
+        career: "整体气运走高，适合定目标。",
+        love: "感情运温暖明朗。"
+      }
+    ];
+
+    const drawBtn = document.getElementById('drawBtn');
+    const cupOverlay = document.getElementById('cupOverlay');
+    const flyingStick = document.getElementById('flyingStick');
+    const burst = document.getElementById('burst');
+    const particles = document.getElementById('particles');
+    const resultMask = document.getElementById('resultMask');
+    const closeBtn = document.getElementById('closeBtn');
+    const closeBtn2 = document.getElementById('closeBtn2');
+    const againBtn = document.getElementById('againBtn');
+    const toast = document.getElementById('toast');
+    const loadingChant = document.getElementById('loadingChant');
+
+    const fortuneLevel = document.getElementById('fortuneLevel');
+    const fortuneTitle = document.getElementById('fortuneTitle');
+    const fortuneNo = document.getElementById('fortuneNo');
+    const fortunePoem = document.getElementById('fortunePoem');
+    const fortuneExplain = document.getElementById('fortuneExplain');
+    const fortuneDo = document.getElementById('fortuneDo');
+    const fortuneDont = document.getElementById('fortuneDont');
+    const fortuneCareer = document.getElementById('fortuneCareer');
+    const fortuneLove = document.getElementById('fortuneLove');
+
+    let drawing = false;
+    let ambientStarted = false;
+    let audioCtx = null;
+    let ambientGain = null;
+
+    function showToast(text, t = 1200) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        toast.classList.remove('show');
+      }, t);
+    }
+
+    function randomFortune() {
+      const idx = Math.floor(Math.random() * fortunes.length);
+      return fortunes[idx];
+    }
+
+    function fillResult(item) {
+      fortuneLevel.textContent = item.level;
+      fortuneTitle.textContent = item.title;
+      fortuneNo.textContent = `第 ${item.no} 签`;
+      fortunePoem.textContent = item.poem;
+      fortuneExplain.textContent = item.explain;
+      fortuneDo.textContent = item.yi;
+      fortuneDont.textContent = item.ji;
+      fortuneCareer.textContent = item.career;
+      fortuneLove.textContent = item.love;
+    }
+
+    function showResult(item) {
+      fillResult(item);
+      resultMask.classList.add('show');
+    }
+
+    function hideResult() {
+      resultMask.classList.remove('show');
+    }
+
+    function createParticles(count = 20) {
+      particles.innerHTML = '';
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('span');
+        p.className = 'particle';
+        const startX = 49 + Math.random() * 9;
+        const startY = 65 + Math.random() * 8;
+        const dx = (Math.random() - 0.5) * 160;
+        const dy = -40 - Math.random() * 220;
+        const size = 4 + Math.random() * 10;
+        const dur = 700 + Math.random() * 900;
+        p.style.left = startX + 'vw';
+        p.style.top = startY + 'vh';
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.animate([
+          { transform: 'translate(0,0) scale(0.6)', opacity: 0 },
+          { opacity: 1, offset: 0.15 },
+          { transform: `translate(${dx}px, ${dy}px) scale(1.2)`, opacity: 0 }
+        ], {
+          duration: dur,
+          easing: 'ease-out',
+          fill: 'forwards'
+        });
+        particles.appendChild(p);
+      }
+      setTimeout(() => particles.innerHTML = '', 1800);
+    }
+
+    async function startDraw() {
+      if (drawing) return;
+      drawing = true;
+
+      await initAudio();
+      startAmbient();
+
+      navigator.vibrate && navigator.vibrate([80, 60, 80, 60, 120]);
+
+      loadingChant.classList.add('show');
+      showToast('小龙王正在为你摇签…', 1400);
+
+      playShakeSound();
+
+      burst.classList.remove('active');
+      cupOverlay.classList.remove('active');
+      flyingStick.classList.remove('active');
+
+      void cupOverlay.offsetWidth;
+      void burst.offsetWidth;
+      void flyingStick.offsetWidth;
+
+      cupOverlay.classList.add('active');
+      burst.classList.add('active');
+      createParticles(26);
+
+      setTimeout(() => {
+        flyingStick.classList.add('active');
+        playChimeSound();
+      }, 620);
+
+      setTimeout(() => {
+        loadingChant.classList.remove('show');
+        const item = randomFortune();
+        showResult(item);
+        drawing = false;
+      }, 1550);
+    }
+
+    drawBtn.addEventListener('click', startDraw);
+    againBtn.addEventListener('click', () => {
+      hideResult();
+      setTimeout(startDraw, 260);
+    });
+    closeBtn.addEventListener('click', hideResult);
+    closeBtn2.addEventListener('click', hideResult);
+    resultMask.addEventListener('click', (e) => {
+      if (e.target === resultMask) hideResult();
+    });
+
+    /* ====== Web Audio 音效 ====== */
+    async function initAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        audioCtx = new AC();
+      }
+      if (audioCtx.state === 'suspended') {
+        await audioCtx.resume();
+      }
+    }
+
+    function startAmbient() {
+      if (!audioCtx || ambientStarted) return;
+      ambientStarted = true;
+
+      ambientGain = audioCtx.createGain();
+      ambientGain.gain.value = 0.018;
+      ambientGain.connect(audioCtx.destination);
+
+      // 海浪白噪声
+      const bufferSize = audioCtx.sampleRate * 2;
+      const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        output[i] = Math.random() * 2 - 1;
+      }
+
+      const noise = audioCtx.createBufferSource();
+      noise.buffer = noiseBuffer;
+      noise.loop = true;
+
+      const lowpass = audioCtx.createBiquadFilter();
+      lowpass.type = 'lowpass';
+      lowpass.frequency.value = 480;
+
+      const lfo = audioCtx.createOscillator();
+      const lfoGain = audioCtx.createGain();
+      lfo.type = 'sine';
+      lfo.frequency.value = 0.18;
+      lfoGain.gain.value = 120;
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(lowpass.frequency);
+
+      const waveGain = audioCtx.createGain();
+      waveGain.gain.value = 0.5;
+
+      noise.connect(lowpass);
+      lowpass.connect(waveGain);
+      waveGain.connect(ambientGain);
+
+      noise.start();
+      lfo.start();
+    }
+
+    function playShakeSound() {
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+
+      // 木质滚动感噪声
+      const duration = 1.1;
+      const bufferSize = audioCtx.sampleRate * duration;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize) * 0.8;
+      }
+
+      const src = audioCtx.createBufferSource();
+      src.buffer = buffer;
+
+      const band = audioCtx.createBiquadFilter();
+      band.type = 'bandpass';
+      band.frequency.value = 900;
+      band.Q.value = 0.8;
+
+      const gain = audioCtx.createGain();
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.exponentialRampToValueAtTime(0.05, now + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      src.connect(band);
+      band.connect(gain);
+      gain.connect(audioCtx.destination);
+      src.start(now);
+
+      // 摇签木杆撞击感
+      for (let i = 0; i < 7; i++) {
+        const t = now + 0.08 + i * 0.12;
+        const osc = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(380 + Math.random() * 220, t);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.02, t + 0.005);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+        osc.connect(g);
+        g.connect(audioCtx.destination);
+        osc.start(t);
+        osc.stop(t + 0.08);
+      }
+    }
+
+    function playChimeSound() {
+      if (!audioCtx) return;
+      const now = audioCtx.currentTime;
+
+      [880, 1320, 1760].forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + i * 0.03);
+        gain.gain.setValueAtTime(0.0001, now + i * 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.045 / (i + 1), now + i * 0.03 + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + i * 0.03 + 0.85);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now + i * 0.03);
+        osc.stop(now + i * 0.03 + 0.9);
+      });
+    }
+
+    // 首次提示
+    setTimeout(() => {
+      showToast('轻点签筒，开启今日灵签', 1800);
+    }, 700);
+  </script>
+</body>
+</html>

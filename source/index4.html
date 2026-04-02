@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>器灵・藏宝图</title>
+  <style>
+    :root {
+      --bg: #f4eadb;
+      --bg-soft: rgba(244, 234, 219, 0.82);
+      --paper: rgba(250, 245, 236, 0.85);
+      --ink: #2f2a26;
+      --brown: #8a6b4f;
+      --line: #c7b299;
+      --gold: #c8aa6a;
+      --qingdai: #5f7c7b;
+      --green: #7f9a86;
+      --red: #a54a3d;
+      --shadow: rgba(80, 60, 40, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "STSong", "SimSun", "Noto Serif SC", serif;
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.5), transparent 35%),
+        linear-gradient(180deg, #f7efe3 0%, #f3e7d7 100%);
+      color: var(--ink);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        repeating-linear-gradient(
+          0deg,
+          rgba(120, 100, 80, 0.02) 0px,
+          rgba(120, 100, 80, 0.02) 1px,
+          transparent 1px,
+          transparent 6px
+        );
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .page {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 90px;
+      position: relative;
+    }
+
+    .hero {
+      position: relative;
+      height: 280px;
+      padding: 24px 20px;
+      overflow: hidden;
+      background:
+        linear-gradient(to bottom, rgba(245,236,223,0.2), rgba(245,236,223,0.85)),
+        url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80') center/cover no-repeat;
+      border-bottom-left-radius: 28px;
+      border-bottom-right-radius: 28px;
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.12), rgba(244,234,219,0.92)),
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.4), transparent 30%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding-top: 24px;
+    }
+
+    .hero-sub {
+      color: var(--brown);
+      font-size: 14px;
+      letter-spacing: 2px;
+      margin-bottom: 10px;
+    }
+
+    .hero-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 30px;
+      color: var(--ink);
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    .seal {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      background: rgba(165, 74, 61, 0.92);
+      color: #fff7ef;
+      font-size: 12px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(165, 74, 61, 0.15);
+    }
+
+    .hero-desc {
+      margin-top: 14px;
+      color: #5e5148;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .hero-ornament {
+      margin: 18px auto 0;
+      width: 150px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--brown), transparent);
+      position: relative;
+    }
+
+    .hero-ornament::before,
+    .hero-ornament::after {
+      content: "✦";
+      position: absolute;
+      top: -9px;
+      color: var(--brown);
+      font-size: 12px;
+    }
+
+    .hero-ornament::before {
+      left: 20px;
+    }
+
+    .hero-ornament::after {
+      right: 20px;
+    }
+
+    .content {
+      padding: 18px 16px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: -26px;
+      position: relative;
+      z-index: 3;
+    }
+
+    .card {
+      background: var(--paper);
+      border: 1px solid rgba(199, 178, 153, 0.75);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: 0 8px 20px var(--shadow);
+      backdrop-filter: blur(4px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, rgba(95,124,123,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 18px;
+      color: var(--ink);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 4px;
+      height: 18px;
+      border-radius: 4px;
+      background: linear-gradient(to bottom, var(--qingdai), var(--gold));
+    }
+
+    .section-tag {
+      font-size: 12px;
+      color: var(--red);
+      border: 1px solid rgba(165,74,61,0.5);
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(165,74,61,0.05);
+    }
+
+    .weather-main {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .weather-city {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .weather-date {
+      font-size: 13px;
+      color: #6e6258;
+    }
+
+    .weather-temp {
+      text-align: right;
+    }
+
+    .temp-num {
+      font-size: 34px;
+      color: var(--qingdai);
+      line-height: 1;
+    }
+
+    .temp-state {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #6b5f54;
+    }
+
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .mini-item {
+      background: rgba(255,255,255,0.35);
+      border: 1px solid rgba(199,178,153,0.35);
+      border-radius: 14px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .mini-label {
+      font-size: 12px;
+      color: #7a6f66;
+      margin-bottom: 6px;
+    }
+
+    .mini-value {
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .fortune-score {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .score-box {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      color: var(--red);
+    }
+
+    .score-num {
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .score-text {
+      font-size: 13px;
+      color: #7a6f66;
+    }
+
+    .fortune-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .fortune-item {
+      background: rgba(255,255,255,0.32);
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(199,178,153,0.35);
+    }
+
+    .fortune-item .label {
+      font-size: 12px;
+      color: #7a6f66;
+      margin-bottom: 6px;
+    }
+
+    .fortune-item .value {
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .quote {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: linear-gradient(90deg, rgba(95,124,123,0.08), rgba(255,255,255,0.15));
+      color: #5a4f46;
+      font-size: 14px;
+      line-height: 1.8;
+      border-left: 3px solid var(--qingdai);
+    }
+
+    .spot-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .spot-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      background: rgba(255,255,255,0.32);
+      border: 1px solid rgba(199,178,153,0.35);
+      border-radius: 16px;
+    }
+
+    .spot-name {
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: var(--ink);
+    }
+
+    .spot-desc {
+      font-size: 13px;
+      color: #6f6459;
+      line-height: 1.7;
+    }
+
+    .spot-right {
+      min-width: 60px;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .spot-hot {
+      color: var(--red);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .spot-tag {
+      font-size: 12px;
+      color: var(--qingdai);
+      background: rgba(95,124,123,0.08);
+      padding: 4px 8px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .bottom-nav {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 10px;
+      width: min(398px, calc(100% - 20px));
+      background: rgba(247, 239, 227, 0.92);
+      border: 1px solid rgba(199,178,153,0.7);
+      border-radius: 18px;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 8px;
+      box-shadow: 0 8px 20px rgba(80,60,40,0.1);
+      backdrop-filter: blur(8px);
+      z-index: 20;
+    }
+
+    .nav-item {
+      flex: 1;
+      text-align: center;
+      color: #7c6c5c;
+      font-size: 12px;
+      text-decoration: none;
+      padding: 6px 0;
+      border-radius: 12px;
+      transition: all 0.25s ease;
+    }
+
+    .nav-icon {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .nav-item.active {
+      color: var(--qingdai);
+      background: rgba(95,124,123,0.08);
+      border: 1px solid rgba(200,170,106,0.45);
+    }
+
+    /* 加载动画 */
+    .loading {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--brown);
+      font-size: 13px;
+    }
+
+    .loading::before {
+      content: "";
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--line);
+      border-top-color: var(--qingdai);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 刷新按钮 */
+    .refresh-btn {
+      background: none;
+      border: 1px solid rgba(199,178,153,0.5);
+      border-radius: 8px;
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--brown);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+    }
+
+    .refresh-btn:hover {
+      background: rgba(95,124,123,0.08);
+      border-color: var(--qingdai);
+      color: var(--qingdai);
+    }
+
+    .refresh-btn:active {
+      transform: scale(0.96);
+    }
+
+    /* 运势等级样式 */
+    .fortune-level {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .fortune-level.da-ji {
+      background: linear-gradient(135deg, #c8aa6a, #e8d5a3);
+      color: #5a4a2a;
+    }
+
+    .fortune-level.zhong-ji {
+      background: linear-gradient(135deg, #7f9a86, #a8c4ae);
+      color: #3a4a3e;
+    }
+
+    .fortune-level.xiao-ji {
+      background: linear-gradient(135deg, #5f7c7b, #8aa5a4);
+      color: #fff;
+    }
+
+    .fortune-level.ping {
+      background: linear-gradient(135deg, #b8a99a, #d4c8bb);
+      color: #5a4f46;
+    }
+
+    .fortune-level.xiong {
+      background: linear-gradient(135deg, #a54a3d, #c77369);
+      color: #fff;
+    }
+
+    /* 地区标签 */
+    .region-tag {
+      font-size: 12px;
+      color: var(--qingdai);
+      background: rgba(95,124,123,0.1);
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-left: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-sub">江南烟雨 · 万象有灵</div>
+        <div class="hero-title">
+          <span>器灵・藏宝图</span>
+          <span class="seal">灵印</span>
+        </div>
+        <div class="hero-ornament"></div>
+        <p class="hero-desc">
+          小庭深深，风入回廊。<br />
+          今日天时、运势与游踪，皆可于此徐徐展开。
+        </p>
+      </div>
+    </section>
+
+    <main class="content">
+      <!-- 天气 -->
+      <section class="card" id="weather-card">
+        <div class="section-head">
+          <h2 class="section-title">当地天气</h2>
+          <span class="section-tag" id="region-desc">正在定位...</span>
+        </div>
+
+        <div class="weather-main">
+          <div>
+            <div class="weather-city" id="city-name">
+              <span class="loading">获取位置中</span>
+            </div>
+            <div class="weather-date" id="current-date">--</div>
+          </div>
+          <div class="weather-temp">
+            <div class="temp-num" id="temp-num">--°C</div>
+            <div class="temp-state" id="weather-state">--</div>
+          </div>
+        </div>
+
+        <div class="weather-grid">
+          <div class="mini-item">
+            <div class="mini-label">风力</div>
+            <div class="mini-value" id="wind-info">--</div>
+          </div>
+          <div class="mini-item">
+            <div class="mini-label">湿度</div>
+            <div class="mini-value" id="humidity">--%</div>
+          </div>
+          <div class="mini-item">
+            <div class="mini-label">空气</div>
+            <div class="mini-value" id="air-quality">--</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 今日运势 -->
+      <section class="card" id="fortune-card">
+        <div class="section-head">
+          <h2 class="section-title">今日运势</h2>
+          <span class="section-tag" id="fortune-level-tag">测算中...</span>
+        </div>
+
+        <div class="fortune-score">
+          <div>
+            <div class="score-text">运势评分</div>
+            <div class="score-box">
+              <span class="score-num" id="fortune-score">--</span>
+              <span>/ 100</span>
+            </div>
+          </div>
+          <button class="refresh-btn" onclick="refreshFortune()">换一卦</button>
+        </div>
+
+        <div class="fortune-list">
+          <div class="fortune-item">
+            <div class="label">宜</div>
+            <div class="value" id="fortune-yi">--</div>
+          </div>
+          <div class="fortune-item">
+            <div class="label">忌</div>
+            <div class="value" id="fortune-ji">--</div>
+          </div>
+          <div class="fortune-item">
+            <div class="label">幸运色</div>
+            <div class="value" id="lucky-color">--</div>
+          </div>
+          <div class="fortune-item">
+            <div class="label">幸运方位</div>
+            <div class="value" id="lucky-direction">--</div>
+          </div>
+        </div>
+
+        <div class="quote" id="fortune-quote">签语：静待天机...</div>
+      </section>
+
+      <!-- 热门地点 -->
+      <section class="card">
+        <div class="section-head">
+          <h2 class="section-title">旅游热门地点</h2>
+          <span class="section-tag" id="spot-season">春日推荐</span>
+        </div>
+
+        <div class="spot-list" id="spot-list">
+          <!-- 动态填充 -->
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active">
+      <span class="nav-icon">⌂</span>
+      <span>首页</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">☯</span>
+      <span>问龙王</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">◌</span>
+      <span>我的</span>
+    </a>
+  </nav>
+
+  <script>
+    // ==================== 离线运势系统 ====================
+    const FortuneSystem = {
+      // 运势等级配置
+      levels: [
+        { name: '大吉', class: 'da-ji', range: [85, 100] },
+        { name: '中吉', class: 'zhong-ji', range: [70, 84] },
+        { name: '小吉', class: 'xiao-ji', range: [55, 69] },
+        { name: '平', class: 'ping', range: [40, 54] },
+        { name: '凶', class: 'xiong', range: [0, 39] }
+      ],
+
+      // 宜事项库
+      yiItems: [
+        '出行', '会友', '祈福', '签约', '求学', '纳财', '开业', '婚嫁',
+        '访客', '远游', '读书', '养生', '静思', '赏景', '品茗', '书画',
+        '登高', '望远', '聚会', '谈心', '置物', '修缮', '栽种', '赴宴'
+      ],
+
+      // 忌事项库
+      jiItems: [
+        '急躁', '夜行', '争执', '妄动', '借贷', '诉讼', '远行', '动土',
+        '冒险', '酗酒', '熬夜', '口舌', '投机', '乱花', '暴饮', '懈怠',
+        '猜疑', '强求', '冲动', '贪心', '多言', '轻信', '孤行', '固执'
+      ],
+
+      // 幸运色
+      luckyColors: [
+        { name: '青黛', color: '#5f7c7b' },
+        { name: '胭脂', color: '#a54a3d' },
+        { name: '鹅黄', color: '#c8aa6a' },
+        { name: '竹青', color: '#7f9a86' },
+        { name: '藕荷', color: '#b8a99a' },
+        { name: '天青', color: '#68b0ab' },
+        { name: '绛紫', color: '#8b5a6b' },
+        { name: '秋香', color: '#9a8b4f' },
+        { name: '月白', color: '#d6e4e5' },
+        { name: '檀红', color: '#c45a5a' }
+      ],
+
+      // 方位
+      directions: ['东', '南', '西', '北', '东南', '东北', '西南', '西北'],
+
+      // 签语库（按运势等级分类）
+      quotes: {
+        daJi: [
+          '龙飞凤舞，万事亨通。今日行事，皆有天助。',
+          '紫气东来，福星高照。心怀善念，好运自至。',
+          '春风得意，马到成功。把握时机，大展宏图。',
+          '金风玉露，喜事临门。贵人相助，百事顺遂。',
+          '云开见月，水到渠成。坚持本心，必获善果。'
+        ],
+        zhongJi: [
+          '心若止水，福至自来。缓行一步，反得佳境。',
+          '稳中求进，循序渐进。耐心等待，终见曙光。',
+          '守得云开，见月明时。静待花开，不负韶华。',
+          '脚踏实地，厚积薄发。勤勉自励，渐入佳境。',
+          '和气生财，以诚待人。广结善缘，福泽绵长。'
+        ],
+        xiaoJi: [
+          '小雨润物，细水长流。不急不躁，自有收获。',
+          '平淡是真，知足常乐。随遇而安，心境自宽。',
+          '一步一行，稳扎稳打。小有进展，勿贪大功。',
+          '寻常日子，平安是福。珍惜当下，感恩所有。',
+          '虽无大喜，亦无大忧。保持平常，安稳度日。'
+        ],
+        ping: [
+          '波澜不惊，静观其变。无需强求，顺其自然。',
+          '风平浪静，宜守不宜攻。养精蓄锐，等待时机。',
+          '不进不退，持中守正。修身养性，以待来日。',
+          '平平淡淡，才是真章。低调行事，避免锋芒。',
+          '今日无事，明日可期。静心养气，蓄势而发。'
+        ],
+        xiong: [
+          '暗云蔽日，宜静不宜动。谨慎行事，避免冲突。',
+          '退一步海阔天空，忍一时风平浪静。',
+          '时运不济，需避其锋。隐忍克制，待时而动。',
+          '凡事三思，不可冲动。言多必失，慎之慎之。',
+          '小人当道，君子慎行。明哲保身，静待转机。'
+        ]
+      },
+
+      // 基于日期生成稳定的随机数种子
+      getDaySeed(date = new Date()) {
+        const dateStr = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+        let hash = 0;
+        for (let i = 0; i < dateStr.length; i++) {
+          const char = dateStr.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash;
+        }
+        return Math.abs(hash);
+      },
+
+      // 伪随机数生成器（基于种子）
+      seededRandom(seed) {
+        const x = Math.sin(seed) * 10000;
+        return x - Math.floor(x);
+      },
+
+      // 从数组中随机选取n个不重复元素
+      pickRandom(arr, n, seed) {
+        const shuffled = [...arr];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+          const j = Math.floor(this.seededRandom(seed + i) * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled.slice(0, n);
+      },
+
+      // 生成今日运势
+      generate(forceNew = false) {
+        const today = new Date();
+        const storageKey = 'fortune_' + today.toDateString();
+        
+        // 检查是否有今日缓存
+        if (!forceNew) {
+          const cached = localStorage.getItem(storageKey);
+          if (cached) {
+            return JSON.parse(cached);
+          }
+        }
+
+        // 生成种子（强制刷新时添加随机值）
+        let seed = this.getDaySeed(today);
+        if (forceNew) {
+          seed += Date.now();
+        }
+
+        // 生成运势分数 (40-98之间，稍微偏向好运)
+        const baseScore = Math.floor(this.seededRandom(seed) * 100);
+        const score = Math.min(98, Math.max(40, Math.floor(baseScore * 0.6 + 40)));
+
+        // 确定运势等级
+        const level = this.levels.find(l => score >= l.range[0] && score <= l.range[1]);
+
+        // 生成宜忌
+        const yiCount = score > 70 ? 4 : (score > 50 ? 3 : 2);
+        const jiCount = score < 50 ? 4 : (score < 70 ? 3 : 2);
+        const yi = this.pickRandom(this.yiItems, yiCount, seed + 1);
+        const ji = this.pickRandom(this.jiItems, jiCount, seed + 2);
+
+        // 幸运色和方位
+        const colorIndex = Math.floor(this.seededRandom(seed + 3) * this.luckyColors.length);
+        const dirIndex = Math.floor(this.seededRandom(seed + 4) * this.directions.length);
+
+        // 签语
+        let quotePool;
+        if (score >= 85) quotePool = this.quotes.daJi;
+        else if (score >= 70) quotePool = this.quotes.zhongJi;
+        else if (score >= 55) quotePool = this.quotes.xiaoJi;
+        else if (score >= 40) quotePool = this.quotes.ping;
+        else quotePool = this.quotes.xiong;
+        
+        const quoteIndex = Math.floor(this.seededRandom(seed + 5) * quotePool.length);
+
+        const fortune = {
+          score,
+          level: level.name,
+          levelClass: level.class,
+          yi: yi.join('、'),
+          ji: ji.join('、'),
+          luckyColor: this.luckyColors[colorIndex],
+          luckyDirection: this.directions[dirIndex],
+          quote: quotePool[quoteIndex],
+          generatedAt: Date.now()
+        };
+
+        // 缓存到本地存储
+        localStorage.setItem(storageKey, JSON.stringify(fortune));
+
+        return fortune;
+      }
+    };
+
+    // ==================== 位置与天气系统 ====================
+    const LocationSystem = {
+      // 城市景点数据库
+      citySpots: {
+        '北京': [
+          { name: '故宫', desc: '明清皇宫，世界文化遗产，感受六百年皇家气象。', hot: 99, tag: '皇家气韵' },
+          { name: '颐和园', desc: '皇家园林，昆明湖畔，长廊画卷，四季皆宜。', hot: 95, tag: '皇家园林' },
+          { name: '南锣鼓巷', desc: '京城古巷，胡同文化，品味老北京的烟火气息。', hot: 88, tag: '胡同漫步' }
+        ],
+        '上海': [
+          { name: '外滩', desc: '百年建筑群，浦江两岸，看尽魔都繁华风华。', hot: 98, tag: '摩登风华' },
+          { name: '豫园', desc: '江南古典园林，明代私家花园，小中见大。', hot: 90, tag: '园林雅韵' },
+          { name: '田子坊', desc: '文艺小巷，石库门里弄，艺术与市井交融。', hot: 85, tag: '文艺小巷' }
+        ],
+        '苏州': [
+          { name: '拙政园', desc: '江南名园，曲水回廊，春色入画，适合慢游与赏景。', hot: 98, tag: '园林古韵' },
+          { name: '平江路', desc: '临河古巷，烟火与诗意并存，可听评弹、观夜灯。', hot: 92, tag: '水巷漫游' },
+          { name: '寒山寺', desc: '钟声入夜，古意悠长，适宜静心而游，感受禅意。', hot: 88, tag: '古寺清心' }
+        ],
+        '杭州': [
+          { name: '西湖', desc: '人间天堂，三潭印月，断桥残雪，四季皆画。', hot: 99, tag: '湖光山色' },
+          { name: '灵隐寺', desc: '千年古刹，飞来峰下，香火鼎盛，静心礼佛。', hot: 92, tag: '禅意清幽' },
+          { name: '河坊街', desc: '百年老街，传统手艺，市井烟火，古今交融。', hot: 86, tag: '市井风情' }
+        ],
+        '南京': [
+          { name: '中山陵', desc: '伟人长眠之地，紫金山麓，庄严肃穆。', hot: 95, tag: '历史缅怀' },
+          { name: '夫子庙', desc: '秦淮河畔，金陵旧事，灯火阑珊处。', hot: 93, tag: '秦淮风月' },
+          { name: '玄武湖', desc: '金陵明珠，五洲芳翠，城市绿肺。', hot: 85, tag: '湖光水色' }
+        ],
+        '成都': [
+          { name: '宽窄巷子', desc: '老成都缩影，青砖黛瓦，慢生活体验。', hot: 96, tag: '悠闲时光' },
+          { name: '大熊猫基地', desc: '国宝乐园，萌态可掬，亲近自然。', hot: 98, tag: '萌宠天堂' },
+          { name: '锦里', desc: '三国文化街，川西民俗，美食天堂。', hot: 90, tag: '蜀韵悠长' }
+        ],
+        '西安': [
+          { name: '兵马俑', desc: '千古奇迹，秦皇雄兵，世界第八大奇迹。', hot: 99, tag: '千年震撼' },
+          { name: '大雁塔', desc: '唐代古塔，玄奘法师，佛教文化。', hot: 92, tag: '盛唐遗韵' },
+          { name: '回民街', desc: '千年美食街，西北风味，烟火人间。', hot: 88, tag: '美食江湖' }
+        ],
+        '广州': [
+          { name: '白云山', desc: '羊城第一秀，云蒸霞蔚，登高望远。', hot: 90, tag: '山色空蒙' },
+          { name: '沙面', desc: '欧陆风情，百年建筑，岁月静好。', hot: 88, tag: '异域风情' },
+          { name: '陈家祠', desc: '岭南建筑瑰宝，雕梁画栋，精美绝伦。', hot: 85, tag: '岭南精粹' }
+        ],
+        '深圳': [
+          { name: '世界之窗', desc: '微缩世界，环球风情，足不出户游天下。', hot: 88, tag: '环球掠影' },
+          { name: '大梅沙', desc: '黄金海岸，碧海蓝天，亲海之旅。', hot: 85, tag: '海滨风光' },
+          { name: '华侨城', desc: '创意园区，艺术氛围，现代与传统交融。', hot: 82, tag: '创意乐园' }
+        ],
+        'default': [
+          { name: '当地名胜', desc: '探索本地风景名胜，感受独特的地域文化。', hot: 90, tag: '本地风情' },
+          { name: '古镇老街', desc: '漫步历史街巷，品味岁月沉淀的韵味。', hot: 85, tag: '古韵悠长' },
+          { name: '自然公园', desc: '亲近自然，呼吸新鲜空气，放松身心。', hot: 80, tag: '自然之美' }
+        ]
+      },
+
+      // 季节描述
+      getSeasonDesc() {
+        const month = new Date().getMonth() + 1;
+        if (month >= 3 && month <= 5) return '春日推荐';
+        if (month >= 6 && month <= 8) return '夏日清凉';
+        if (month >= 9 && month <= 11) return '秋日漫游';
+        return '冬日暖阳';
+      },
+
+      // 地区描述
+      getRegionDesc(city) {
+        const regionMap = {
+          '北京': '京华风韵',
+          '上海': '海上明珠',
+          '苏州': '烟雨江南',
+          '杭州': '人间天堂',
+          '南京': '金陵古都',
+          '成都': '天府之国',
+          '西安': '十三朝古都',
+          '广州': '岭南都会',
+          '深圳': '创新之城',
+          '天津': '津门故里',
+          '重庆': '山城雾都',
+          '武汉': '江城明珠',
+          '长沙': '星城长沙',
+          '青岛': '海滨明珠',
+          '厦门': '鹭岛风情',
+          '大连': '北方明珠',
+          '昆明': '春城花海'
+        };
+        return regionMap[city] || '神州大地';
+      },
+
+      // 根据城市获取景点
+      getSpotsByCity(city) {
+        // 尝试精确匹配
+        if (this.citySpots[city]) {
+          return this.citySpots[city];
+        }
+        
+        // 尝试模糊匹配
+        for (const key of Object.keys(this.citySpots)) {
+          if (city.includes(key) || key.includes(city)) {
+            return this.citySpots[key];
+          }
+        }
+        
+        return this.citySpots['default'];
+      },
+
+      // 通过IP获取位置信息
+      async getLocationByIP() {
+        const apis = [
+          {
+            url: 'https://ipapi.co/json/',
+            parse: (data) => ({
+              city: data.city || data.region,
+              region: data.region,
+              country: data.country_name,
+              lat: data.latitude,
+              lon: data.longitude
+            })
+          },
+          {
+            url: 'https://ip-api.com/json/?lang=zh-CN',
+            parse: (data) => ({
+              city: data.city,
+              region: data.regionName,
+              country: data.country,
+              lat: data.lat,
+              lon: data.lon
+            })
+          },
+          {
+            url: 'https://ipwho.is/',
+            parse: (data) => ({
+              city: data.city,
+              region: data.region,
+              country: data.country,
+              lat: data.latitude,
+              lon: data.longitude
+            })
+          }
+        ];
+
+        for (const api of apis) {
+          try {
+            const response = await fetch(api.url, { timeout: 5000 });
+            if (response.ok) {
+              const data = await response.json();
+              const location = api.parse(data);
+              if (location.city) {
+                return location;
+              }
+            }
+          } catch (e) {
+            console.log(`API ${api.url} failed:`, e);
+          }
+        }
+
+        // 所有API都失败，返回默认位置
+        return {
+          city: '苏州',
+          region: '江苏',
+          country: '中国',
+          lat: 31.299,
+          lon: 120.585,
+          isDefault: true
+        };
+      }
+    };
+
+    // ==================== 模拟天气系统 ====================
+    const WeatherSystem = {
+      // 天气状态库
+      weatherTypes: [
+        { name: '晴', weight: 25 },
+        { name: '多云', weight: 30 },
+        { name: '阴', weight: 15 },
+        { name: '小雨', weight: 10 },
+        { name: '阵雨', weight: 8 },
+        { name: '多云转晴', weight: 7 },
+        { name: '晴转多云', weight: 5 }
+      ],
+
+      // 风向
+      windDirections: ['东风', '南风', '西风', '北风', '东南风', '东北风', '西南风', '西北风'],
+
+      // 空气质量
+      airQualities: ['优', '良', '轻度', '中度'],
+
+      // 生成模拟天气
+      generate(seed) {
+        const random = (offset) => {
+          const x = Math.sin(seed + offset) * 10000;
+          return x - Math.floor(x);
+        };
+
+        // 根据月份调整温度范围
+        const month = new Date().getMonth();
+        let tempBase, tempRange;
+        
+        if (month >= 2 && month <= 4) { // 春季
+          tempBase = 15;
+          tempRange = 12;
+        } else if (month >= 5 && month <= 7) { // 夏季
+          tempBase = 26;
+          tempRange = 10;
+        } else if (month >= 8 && month <= 10) { // 秋季
+          tempBase = 16;
+          tempRange = 12;
+        } else { // 冬季
+          tempBase = 4;
+          tempRange = 10;
+        }
+
+        const temp = Math.round(tempBase + random(1) * tempRange);
+        
+        // 天气状态（加权随机）
+        const totalWeight = this.weatherTypes.reduce((sum, w) => sum + w.weight, 0);
+        let r = random(2) * totalWeight;
+        let weather = this.weatherTypes[0].name;
+        for (const w of this.weatherTypes) {
+          r -= w.weight;
+          if (r <= 0) {
+            weather = w.name;
+            break;
+          }
+        }
+
+        const windDir = this.windDirections[Math.floor(random(3) * this.windDirections.length)];
+        const windLevel = Math.floor(random(4) * 4) + 1;
+        const humidity = Math.floor(50 + random(5) * 40);
+        const airIndex = Math.floor(random(6) * 3); // 偏向好空气
+
+        return {
+          temp,
+          weather,
+          wind: `${windDir} ${windLevel}级`,
+          humidity: `${humidity}%`,
+          air: this.airQualities[airIndex]
+        };
+      }
+    };
+
+    // ==================== 页面渲染 ====================
+    
+    // 格式化日期
+    function formatDate(date) {
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+      const weekDay = weekDays[date.getDay()];
+      return `${year}年${month}月${day}日 · 星期${weekDay}`;
+    }
+
+    // 更新天气卡片
+    function updateWeatherCard(location, weather) {
+      document.getElementById('city-name').textContent = location.city;
+      if (location.isDefault) {
+        document.getElementById('city-name').innerHTML = `${location.city}<span class="region-tag">默认</span>`;
+      }
+      document.getElementById('current-date').textContent = formatDate(new Date());
+      document.getElementById('temp-num').textContent = `${weather.temp}°C`;
+      document.getElementById('weather-state').textContent = weather.weather;
+      document.getElementById('wind-info').textContent = weather.wind;
+      document.getElementById('humidity').textContent = weather.humidity;
+      document.getElementById('air-quality').textContent = weather.air;
+      document.getElementById('region-desc').textContent = LocationSystem.getRegionDesc(location.city);
+    }
+
+    // 更新运势卡片
+    function updateFortuneCard(fortune) {
+      document.getElementById('fortune-score').textContent = fortune.score;
+      
+      const levelTag = document.getElementById('fortune-level-tag');
+      levelTag.textContent = fortune.level;
+      levelTag.className = `section-tag fortune-level ${fortune.levelClass}`;
+      
+      document.getElementById('fortune-yi').textContent = fortune.yi;
+      document.getElementById('fortune-ji').textContent = fortune.ji;
+      
+      const colorEl = document.getElementById('lucky-color');
+      colorEl.innerHTML = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${fortune.luckyColor.color};margin-right:6px;vertical-align:middle;"></span>${fortune.luckyColor.name}`;
+      
+      document.getElementById('lucky-direction').textContent = fortune.luckyDirection;
+      document.getElementById('fortune-quote').textContent = `签语：${fortune.quote}`;
+    }
+
+    // 更新景点列表
+    function updateSpotList(city) {
+      const spots = LocationSystem.getSpotsByCity(city);
+      const container = document.getElementById('spot-list');
+      
+      container.innerHTML = spots.map(spot => `
+        <div class="spot-item">
+          <div>
+            <div class="spot-name">${spot.name}</div>
+            <div class="spot-desc">${spot.desc}</div>
+          </div>
+          <div class="spot-right">
+            <div class="spot-hot">${spot.hot}°</div>
+            <div class="spot-tag">${spot.tag}</div>
+          </div>
+        </div>
+      `).join('');
+
+      document.getElementById('spot-season').textContent = LocationSystem.getSeasonDesc();
+    }
+
+    // 刷新运势
+    function refreshFortune() {
+      const btn = document.querySelector('.refresh-btn');
+      btn.textContent = '测算中...';
+      btn.disabled = true;
+
+      setTimeout(() => {
+        const fortune = FortuneSystem.generate(true);
+        updateFortuneCard(fortune);
+        btn.textContent = '换一卦';
+        btn.disabled = false;
+      }, 600);
+    }
+
+    // ==================== 初始化 ====================
+    async function init() {
+      // 1. 生成今日运势
+      const fortune = FortuneSystem.generate();
+      updateFortuneCard(fortune);
+
+      // 2. 获取位置并更新天气和景点
+      try {
+        const location = await LocationSystem.getLocationByIP();
+        const seed = FortuneSystem.getDaySeed() + location.city.charCodeAt(0);
+        const weather = WeatherSystem.generate(seed);
+        
+        updateWeatherCard(location, weather);
+        updateSpotList(location.city);
+      } catch (error) {
+        console.error('初始化失败:', error);
+        // 使用默认数据
+        const defaultLocation = { city: '苏州', isDefault: true };
+        const weather = WeatherSystem.generate(FortuneSystem.getDaySeed());
+        updateWeatherCard(defaultLocation, weather);
+        updateSpotList('苏州');
+      }
+    }
+
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

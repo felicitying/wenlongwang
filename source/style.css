@@ -1,0 +1,465 @@
+:root {
+  --page-max-width: 480px;
+  --page-bg-1: #f6ead7;
+  --page-bg-2: #f8e8cd;
+  --page-bg-3: #f3dfc0;
+
+  --text-main: #6b4527;
+  --text-dark: #5a3821;
+  --text-body: #7a5b43;
+  --text-light: #a88a6e;
+
+  --white: rgba(255, 255, 255, 0.72);
+  --white-strong: rgba(255, 255, 255, 0.88);
+  --stroke: rgba(255, 255, 255, 0.45);
+
+  --shadow-soft: 0 12px 35px rgba(170, 135, 86, 0.16);
+  --shadow-card: 0 10px 26px rgba(177, 146, 103, 0.15);
+
+  --radius-xl: 34px;
+  --radius-lg: 28px;
+  --radius-md: 24px;
+  --radius-sm: 20px;
+
+  --love-1: #ffd3dd;
+  --love-2: #fff3f6;
+
+  --career-1: #a7d8ff;
+  --career-2: #eef8ff;
+
+  --wealth-1: #ffd773;
+  --wealth-2: #fff6db;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family:
+    "PingFang SC",
+    "Hiragino Sans GB",
+    "Microsoft YaHei",
+    "Noto Sans SC",
+    sans-serif;
+  color: var(--text-main);
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255,255,255,0.75), transparent 20%),
+    radial-gradient(circle at 85% 60%, rgba(255,255,255,0.35), transparent 18%),
+    radial-gradient(circle at 15% 90%, rgba(255,255,255,0.28), transparent 15%),
+    linear-gradient(180deg, #f7ecd9 0%, #f7e5cb 48%, #f1dcc0 100%);
+  min-height: 100vh;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+button {
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+.page-shell {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.mobile-page {
+  width: 100%;
+  max-width: var(--page-max-width);
+  min-height: 100vh;
+  padding: 0 1rem 2rem;
+  position: relative;
+}
+
+/* 顶部 Banner */
+.hero-section {
+  width: calc(100% + 2rem);
+  margin-left: -1rem;
+  margin-right: -1rem;
+  position: relative;
+}
+
+.hero-banner {
+  width: 100%;
+  height: clamp(290px, 44vh, 430px);
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* 通用玻璃卡片 */
+.glass-card {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.84) 0%,
+    rgba(255, 255, 255, 0.70) 100%
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow-soft);
+  border-radius: var(--radius-xl);
+}
+
+/* 天气卡片 */
+.weather-card {
+  margin-top: -1.1rem;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.weather-bg {
+  position: absolute;
+  inset: 0;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.weather-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.weather-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 13.5rem;
+}
+
+.weather-left {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0.35rem 0 0.2rem 0.15rem;
+}
+
+.location-row {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.icon-location {
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
+}
+
+.city-name {
+  font-size: clamp(1.5rem, 4.5vw, 2rem);
+  font-weight: 700;
+  color: var(--text-dark);
+  letter-spacing: 0.02em;
+}
+
+.temp-row {
+  margin-top: 0.35rem;
+}
+
+.temperature {
+  font-size: clamp(3.25rem, 10vw, 4.8rem);
+  line-height: 1;
+  font-weight: 400;
+  color: var(--text-dark);
+  letter-spacing: -0.03em;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: clamp(1rem, 3.4vw, 1.35rem);
+  color: #7b5f48;
+  font-weight: 500;
+}
+
+.divider-space {
+  width: 0.6rem;
+}
+
+.weather-right {
+  position: relative;
+  min-width: 8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3.7rem;
+  height: 3.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 6px 18px rgba(159, 130, 96, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-refresh {
+  width: 1.9rem;
+  height: 1.9rem;
+  object-fit: contain;
+}
+
+.icon-sun {
+  width: clamp(5rem, 18vw, 7rem);
+  height: clamp(5rem, 18vw, 7rem);
+  object-fit: contain;
+  filter: drop-shadow(0 8px 14px rgba(255, 197, 69, 0.22));
+  margin-top: 1rem;
+}
+
+/* 标题头 */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.section-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.section-icon {
+  width: 2.1rem;
+  height: 2.1rem;
+  object-fit: contain;
+}
+
+.section-title {
+  margin: 0;
+  font-size: clamp(1.7rem, 5vw, 2.2rem);
+  line-height: 1.2;
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+.more-btn {
+  background: rgba(255, 255, 255, 0.72);
+  color: #ba8d5f;
+  border-radius: 999px;
+  padding: 0.55rem 0.95rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(188, 154, 113, 0.12);
+  white-space: nowrap;
+}
+
+.more-btn span {
+  font-size: 1.25rem;
+  vertical-align: -0.02em;
+}
+
+/* 今日运势 */
+.fortune-section {
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.fortune-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+
+.fortune-card {
+  min-height: 10.4rem;
+  border-radius: var(--radius-md);
+  padding: 0.9rem 0.85rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255,255,255,0.48);
+  overflow: hidden;
+  position: relative;
+}
+
+.fortune-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.35), transparent 22%),
+    radial-gradient(circle at 15% 80%, rgba(255,255,255,0.22), transparent 18%);
+  pointer-events: none;
+}
+
+.fortune-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.9rem;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.fortune-card-head img {
+  width: 1.8rem;
+  height: 1.8rem;
+  object-fit: contain;
+}
+
+.fortune-card p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #73553c;
+  position: relative;
+  z-index: 1;
+}
+
+.fortune-card.love {
+  background: linear-gradient(180deg, var(--love-1) 0%, var(--love-2) 100%);
+}
+
+.fortune-card.career {
+  background: linear-gradient(180deg, var(--career-1) 0%, var(--career-2) 100%);
+}
+
+.fortune-card.wealth {
+  background: linear-gradient(180deg, var(--wealth-1) 0%, var(--wealth-2) 100%);
+}
+
+/* 旅游推荐 */
+.travel-section {
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.dots {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: #e3cfb6;
+}
+
+.dot.active {
+  background: #cdb08d;
+}
+
+.travel-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+}
+
+.travel-card {
+  background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.82));
+  border-radius: var(--radius-md);
+  padding: 0.35rem;
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255,255,255,0.55);
+}
+
+.travel-image {
+  width: 100%;
+  aspect-ratio: 1 / 1.03;
+  border-radius: 1.25rem;
+  overflow: hidden;
+}
+
+.travel-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.travel-title {
+  text-align: center;
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  color: var(--text-dark);
+  font-weight: 700;
+  padding: 0.8rem 0.35rem 0.55rem;
+  line-height: 1.25;
+}
+
+/* 小屏适配 */
+@media (max-width: 420px) {
+  .mobile-page {
+    padding: 0 0.85rem 1.6rem;
+  }
+
+  .hero-section {
+    width: calc(100% + 1.7rem);
+    margin-left: -0.85rem;
+    margin-right: -0.85rem;
+  }
+
+  .weather-content {
+    min-height: 12.3rem;
+  }
+
+  .fortune-grid,
+  .travel-grid {
+    gap: 0.65rem;
+  }
+
+  .fortune-card {
+    min-height: 9.5rem;
+    padding: 0.8rem 0.75rem;
+  }
+
+  .fortune-card p {
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 360px) {
+  html {
+    font-size: 15px;
+  }
+
+  .fortune-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .travel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .weather-content {
+    flex-direction: column;
+    min-height: auto;
+  }
+
+  .weather-right {
+    justify-content: flex-end;
+    min-width: auto;
+  }
+
+  .icon-sun {
+    margin-top: 0;
+  }
+}
